@@ -38,8 +38,9 @@ python run_demo.py --no-print --once --headless --record --video-out demo_assets
 python verify_demo.py --export-video
 ```
 
-Recorder không ghi đè: nếu hai file ghi đã tồn tại, dùng tên mới và truyền đường
-dẫn tương ứng qua `verify_demo.py --log ... --video ...`.
+Recorder không ghi đè: nếu video hoặc log đã tồn tại, app tự thêm ngày giờ vào
+cả hai tên file. Nếu trùng cả ngày giờ, thêm số thứ tự. Xem tên thực trong terminal
+hoặc dòng DANG GHI / DA LUU rồi truyền đúng cặp qua `verify_demo.py --log ... --video ...`.
 
 - `demo_assets/validation_render.md`: báo cáo kiểm tra đúng ID, LOST, bám lại và căn chỉnh.
 - `demo_assets/demo_hud_render.mp4`: video đã ghép HUD, mở bằng trình phát bình thường khi app lỗi.

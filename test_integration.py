@@ -138,6 +138,38 @@ class IntegrationTests(unittest.TestCase):
             self.assertIsNotNone(image)
             self.assertGreater(image.shape[0], 100)
 
+    def test_recording_existing_files_starts_a_new_session(self):
+        for occupied in ('video', 'log', 'both', 'collision'):
+            with self.subTest(occupied=occupied):
+                directory = self.root / occupied
+                directory.mkdir()
+                video, log = directory / 'my_demo.mp4', directory / 'my_demo.csv'
+                if occupied in ('video', 'both', 'collision'):
+                    video.write_bytes(b'keep old video')
+                if occupied in ('log', 'both', 'collision'):
+                    log.write_text('keep old log', encoding='utf-8')
+                if occupied == 'collision':
+                    (directory / 'my_demo_20261016_170000.mp4').write_bytes(b'keep previous session')
+                args = app.build_parser().parse_args([
+                    '--synthetic', '--headless', '--max-frames', '3', '--record',
+                    '--video-out', str(video), '--log-out', str(log),
+                ])
+                with patch('main.time.strftime', return_value='20261016_170000'):
+                    self.assertEqual(app.run(args), 3)
+                if occupied in ('video', 'both', 'collision'):
+                    self.assertEqual(video.read_bytes(), b'keep old video')
+                if occupied in ('log', 'both', 'collision'):
+                    self.assertEqual(log.read_text(encoding='utf-8'), 'keep old log')
+                serial = '_1' if occupied == 'collision' else ''
+                new_video = directory / f'my_demo_20261016_170000{serial}.mp4'
+                new_log = directory / f'my_demo_20261016_170000{serial}.csv'
+                self.assertGreater(new_video.stat().st_size, 0)
+                with new_log.open(newline='', encoding='utf-8') as handle:
+                    self.assertEqual(len(list(csv.DictReader(handle))), 3)
+                if occupied == 'collision':
+                    self.assertEqual((directory / 'my_demo_20261016_170000.mp4').read_bytes(),
+                                     b'keep previous session')
+
     def test_ambiguous_measurement_never_confirms_alignment(self):
         from collect_gt import make_row
 

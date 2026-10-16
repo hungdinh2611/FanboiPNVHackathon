@@ -216,6 +216,24 @@ def array_json(value):
     return '' if value is None else json.dumps(np.asarray(value).tolist(), separators=(',', ':'))
 
 
+def new_recording_paths(video, log):
+    """Keep a free requested pair, otherwise choose a shared timestamp/suffix."""
+    video, log = Path(video), Path(log)
+    if video.resolve() == log.resolve():
+        raise ValueError('Video and CSV paths must differ')
+    if not video.exists() and not log.exists():
+        return str(video), str(log)
+    stamp = time.strftime('%Y%m%d_%H%M%S')
+    serial = 0
+    while True:
+        suffix = '_' + stamp + (f'_{serial}' if serial else '')
+        candidate_video = video.with_name(video.stem + suffix + video.suffix)
+        candidate_log = log.with_name(log.stem + suffix + log.suffix)
+        if not candidate_video.exists() and not candidate_log.exists():
+            return str(candidate_video), str(candidate_log)
+        serial += 1
+
+
 class Recorder:
     """One CSV row for each saved raw frame; frame_index guarantees replay pairing.
 
@@ -454,6 +472,7 @@ def run(args):
     recorder = None
     canvas = None
     want_record = args.record
+    recording_base = (args.video_out, args.log_out)
     frozen = False
     count = 0
     cycle_start_count = 0
@@ -557,8 +576,10 @@ def run(args):
                     if any(Path(p).resolve() == Path(args.video_out).resolve() for p in protected):
                         raise ValueError('Recording output is also the active input video')
                     try:
+                        args.video_out, args.log_out = new_recording_paths(*recording_base)
                         recorder = Recorder(args.video_out, args.log_out, capture.fps,
                                             (packet.frame.shape[1], packet.frame.shape[0]))
+                        notice = f'DANG GHI: {Path(args.video_out).name} | {Path(args.log_out).name}'
                         print(f'Recording: {args.video_out} + {args.log_out}')
                     except (OSError, ValueError, cv2.error) as exc:
                         if args.headless:
@@ -607,11 +628,8 @@ def run(args):
                     if recorder is not None:
                         recorder.close()
                         recorder = None
-                        # Continue into a new segment; never silently overwrite prior evidence.
-                        stamp = time.strftime('%Y%m%d_%H%M%S') + f'_{count}'
-                        args.video_out = str(Path(args.video_out).with_name('video_' + stamp + '.mp4'))
-                        args.log_out = str(Path(args.log_out).with_name('log_' + stamp + '.csv'))
-                        notice = 'DA LUU VIDEO + CSV'
+                        notice = f'DA LUU: {Path(args.video_out).name} | {Path(args.log_out).name}'
+                        print(f'Saved: {args.video_out} + {args.log_out}')
                     else:
                         want_record = not want_record
         if canvas is not None and args.snapshot:
