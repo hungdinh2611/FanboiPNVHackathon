@@ -3,6 +3,35 @@
 Phạm vi: `calibrate.py`, `perception.py`, `test_perception.py`, hai ảnh mẫu in.
 Giao diện `contract.py` giữ nguyên. Không cần đợi filter hoặc main để thử P1.
 
+## Chạy bản tích hợp P1/P2/P3/P4
+
+```powershell
+python run_demo.py
+```
+
+Lệnh này chạy `main.py` của P3 với perception P1 và Kalman P2. Nếu có `calib.npz`
+thì dùng file đó. Nếu chưa có, tạo `calib_approx.npz` với HFOV **giả định 68°**,
+ảnh 1280×720; HUD hiện cảnh báo `CALIB FOV UOC LUONG - CHUA KIEM CHUNG`.
+Đây là chế độ dự phòng để demo chạy ngay, chưa xác nhận độ chính xác cm.
+Không tự sửa module hoặc contract của người khác.
+
+- R: ghi video + CSV, F: bật/tắt Kalman, SPACE: dừng/tiếp tục, Q: thoát.
+- Demo không cần webcam: `python run_demo.py --synthetic` (hiện nhãn dữ liệu giả).
+- Kiểm tra tự động: `python run_demo.py --check`.
+- Kiểm webcam có giới hạn: `python run_demo.py --headless --max-frames 90`.
+- Replay sau khi ghi: `python run_demo.py --source video.mp4 --replay log.csv`.
+- Thu GT thật bằng công cụ P4: `python collect_gt.py --calib calib.npz`.
+  Sau đó: `python evaluate.py --csv data/gt_runs.csv --out report`.
+
+`test_integration.py` kiểm toàn luồng bằng ảnh ArUco render, marker sai ID/mất thẻ,
+LOST, ghi/phát lại 48 frame cùng timestamp, camera lỗi chuyển video, và P4 sinh
+360 dòng/12 tư thế rồi xuất báo cáo/biểu đồ có nhãn dữ liệu giả. Mọi file thử dùng
+thư mục tạm; không ghi đè GT, báo cáo hay video của team.
+
+P4 hiện đã bàn giao công cụ và báo cáo **tổng hợp**; còn cần hiệu chuẩn thật,
+thu `data/gt_runs.csv`, ghi nhận ba ca lỗi, điền số thật trong Q&A và quay video live
+dự phòng. Chưa có các mục này thì chưa đạt checklist nghiệm thu vật lý của hackathon.
+
 ## Chạy trên máy Hưng
 
 Đã kiểm tra Python 3.10.4, OpenCV 4.9.0, NumPy 1.23.1.
