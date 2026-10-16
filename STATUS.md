@@ -10,3 +10,5 @@ Yêu cầu tích hợp P3: dùng Perceiver('calib.npz') hoặc chỉ rõ calib_a
 
 [2026-10-16 14:51 Asia/Saigon] P2 Ngô Thế Việt - Đã hoàn thành synthetic.py, timing.py, guidance.py, filter.py, test_filter.py; test đứng yên giảm std >80% (x: 1.639->0.232 cm, z: 2.455->0.395 cm, yaw: 3.504->0.855 deg), tỉ lệ lỗi thực nằm trong +-2*sigma đạt 93-99%, Mahalanobis gating + hysteresis guidance + LOST/reset đều PASS - Tiếp: hỗ trợ P3 ghép AlignmentKF vào main.py và P4 chạy evaluate.py trên dữ liệu giả/thật - Không vướng gì.
 
+
+[2026-10-16 15:06 Asia/Saigon] P4 Linh (máy Đạo) - Xong protocol.md (lưới 12 tư thế, bước thống nhất dấu x/yaw với P1, sai số GT ±2 mm/±2 độ), collect_gt.py (live: SPACE chụp 30 frame raw+KF+sigma+latency, E sửa GT thực đo, K gắn nhãn ca lỗi; --synthetic dùng synthetic.py của P2), evaluate.py (MAE/p95 theo z và yaw, biểu đồ, std đứng yên raw/MAD/KF, tỉ lệ trong ±2 sigma, latency p50/p95, bảng ca lỗi). Đã chạy hết pipeline trên dữ liệu GIẢ (report/metrics_synthetic.md) - KHÔNG phải bằng chứng - Tiếp: chờ calib.npz thật của P1, đo chung dấu yaw, thu data/gt_runs.csv và 3 ca lỗi - Vướng: chưa có calib.npz, chưa thử collect_gt.py với webcam thật.
