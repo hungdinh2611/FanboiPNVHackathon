@@ -53,7 +53,7 @@ không dùng làm cam kết. Tham số quyết định nhiều nhất là số p
 | --- | --- | --- |
 | Che khuất (tay, nắp sạc, bùn) | Mất marker hoặc pose sai | Trạng thái LOST, không đưa chỉ dẫn; gating Mahalanobis loại outlier |
 | Thời tiết, lóa, đêm | Detector hỏng, reproj error tăng | Theo dõi reproj error; về sau thêm đèn IR, camera HDR |
-| Nghiêng lớn (hơn 60 độ) | Hai nghiệm PnP gần nhau, có thể lật | Cờ `ambiguous` chuyển sang DEGRADED; hướng dẫn tiếp cận gần trực diện |
+| Nghiêng lớn, marker nhỏ hoặc xa | Co ngắn, mất góc, hoặc hai nghiệm PnP gần nhau | Reproj error, cờ `ambiguous` chuyển DEGRADED; hướng dẫn tiếp cận gần trực diện |
 | Hiệu chuẩn lệch (autofocus, đổi camera) | Sai số hệ thống mà filter không thấy | Khóa focus, kiểm tra lại bằng thước định kỳ |
 | An toàn điện khi robot cắm | Hư hỏng, nguy hiểm | Con người xác nhận cuối; robot chỉ cắm khi status GOOD và sigma nhỏ |
 | Marker không có trên xe thật | Demo không chuyển thẳng ra thực tế được | Đã nêu: bước 2 của lộ trình |

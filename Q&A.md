@@ -16,10 +16,11 @@ Vì biết trước cạnh marker là 6 cm. Ảnh marker càng nhỏ thì càng 
 khớp 4 góc marker với 4 điểm 3D đã biết. Hệ quả là sai số z tăng theo z²: ở xa, lệch 1 pixel tương ứng
 nhiều cm hơn. Bảng lỗi theo z cho thấy điều đó: `[điền số thật]`.
 
-**3. Vì sao nghiêng nhiều thì hệ thống báo ambiguous?**
-Marker phẳng nhìn từ xa hoặc nghiêng thì phép chiếu gần như affine. Khi đó có hai tư thế (nghiêng trái và
-nghiêng phải) cho ảnh gần giống nhau. IPPE trả về cả hai nghiệm. Nếu lỗi chiếu lại của hai nghiệm chênh nhau
-dưới 20%, hệ thống không dám chọn, bật `ambiguous=True` và chuyển DEGRADED. Đây chính là ca lỗi yaw lớn hơn 60 độ.
+**3. Khi nào hệ thống báo ambiguous? Nghiêng lớn thì sao?**
+Marker phẳng ở xa hoặc ảnh nhỏ thì phép chiếu gần như affine: hai tư thế nghiêng ngược nhau cho ảnh gần giống nhau.
+IPPE trả về cả hai nghiệm. Nếu lỗi chiếu lại của hai nghiệm chênh dưới 20% thì bật `ambiguous=True` và chuyển DEGRADED.
+Nghiêng lớn (hơn 60 độ) KHÔNG bảo đảm lúc nào cũng ambiguous. Nó làm marker co ngắn, góc khó tìm, có thể mất
+nhận diện hoặc reproj error tăng. Chỉ nói phản ứng đã thấy trên ca lỗi thật: `[điền từ bảng ca lỗi metrics.md]`.
 
 ## P2 — Việt (Bất định, Thời gian)
 

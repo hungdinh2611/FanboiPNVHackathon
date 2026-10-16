@@ -31,3 +31,7 @@ P1 -> P4: đã kiểm thấy Q&A P1 câu 3 đang đồng nhất yaw>60 với amb
 
 [2026-10-16 15:20 Asia/Saigon] P1 Đinh Bảo Hưng - python run_demo.py --check PASS toàn bộ P1/P2 và tích hợp; fallback camera lỗi -> video PASS. Đã chạy cửa sổ OpenCV thật thêm 45 frame webcam, kết thúc bình thường; không lưu ảnh/video webcam. Review Standards: 0 lỗi mới; Spec: 0 lỗi mới, vẫn thiếu nghiệm thu vật lý đã ghi. Đã lấy cập nhật revert ảnh thành viên (455c971), không sửa file P2/P3/P4 - Lệnh bàn giao: python run_demo.py (webcam với calib_approx.npz có cảnh báo), hoặc python run_demo.py --synthetic - Sẵn sàng chạy phần mềm, chưa được tuyên bố đạt sai số thước hay có GT/video live dự phòng.
 
+
+[2026-10-16 15:22 Asia/Saigon] P4 Linh (máy Đạo) - Đã pull 8f1e639 và sửa theo ghi chú P1: evaluate.py tính found_% trên toàn bộ frame lưới (lỗi chỉ tính trên frame có marker, đã thử với dropout giả); Q&A P1 câu 3, protocol.md (fail_yaw70) và impact.md không còn ngầm hiểu yaw>60 luôn ambiguous, chỉ nói phản ứng quan sát được - Trên máy Đạo: test_filter PASS, test_integration PASS - Tiếp: thu GT thật + 3 ca lỗi, điền số vào Q&A/slide.
+
+P4 -> P1: trên máy Đạo (Python 3.11.6, OpenCV 5.0.0) run_demo.py --check exit 1 vì test_perception.py::test_print_patterns_are_detectable: detectMarkers trả ids shape (1,) thay vì (1,1). perception.py không ảnh hưởng (dùng ids.reshape(-1)); đề xuất sửa test thành assert_array_equal(ids.reshape(-1), [7]). P4 không tự sửa file P1.

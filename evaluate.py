@@ -39,9 +39,11 @@ def mae(s):
 
 
 def table_by(df, key):
+    """df la toan bo frame luoi: found_% tinh tren tat ca, loi chi tinh tren frame co marker."""
     rows = []
-    for val, g in df.groupby(key):
-        r = {key: val, "n": len(g), "found_%": 100 * g["found"].mean()}
+    for val, g_all in df.groupby(key):
+        g = g_all[g_all["found"] == 1]
+        r = {key: val, "n": len(g_all), "found_%": 100 * g_all["found"].mean()}
         for ax, _ in AXES:
             for src in ("raw", "kf"):
                 r[f"MAE_{src}_{ax}"] = mae(g[f"err_{src}_{ax}"])
@@ -147,8 +149,8 @@ def main():
     parts += [
         f"Tong {len(df)} frame, {grid['pose_id'].nunique()} tu the luoi, ti le nhan dien luoi "
         f"{100 * grid['found'].mean():.1f}%. Sai so GT gia dinh: +-{args.gt_err_cm} cm, +-{args.gt_err_deg} deg.",
-        "", "## (a) Loi theo khoang cach z", "", md(table_by(found, "gt_z")),
-        "", "## (a) Loi theo yaw", "", md(table_by(found, "gt_yaw")),
+        "", "## (a) Loi theo khoang cach z", "", md(table_by(grid, "gt_z")),
+        "", "## (a) Loi theo yaw", "", md(table_by(grid, "gt_yaw")),
         "", "## (b) Bieu do", "", f"![loi theo z]({os.path.basename(p_z)})",
         f"![loi theo yaw]({os.path.basename(p_yaw)})",
         "", "## (c) Do rung dung yen (std trong 30 frame, trung vi qua cac tu the)", "", md(static_std(found)),

@@ -55,7 +55,8 @@ Ground truth là số ĐO ĐƯỢC, không phải số dự định.
 Nhấn K, gõ nhãn ca lỗi, đặt thẻ đúng tư thế ghi GT rồi nhấn SPACE như bình thường. Nhãn gợi ý:
 
 - `fail_glare`: đèn flash điện thoại chiếu vào thẻ tạo vệt lóa.
-- `fail_yaw70`: yaw khoảng 70 độ, quan sát lật nghiệm PnP / `ambiguous`.
+- `fail_yaw70`: yaw khoảng 70 độ; ghi lại điều QUAN SÁT được (mất nhận diện, reproj error tăng, `ambiguous`,
+  nhảy dấu yaw). Không mặc định là sẽ có `ambiguous`.
 - `fail_blur`: lắc thẻ nhanh khi chụp (mờ chuyển động).
 - `fail_occlude`: ngón tay che một góc thẻ.
 
