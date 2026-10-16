@@ -1,6 +1,8 @@
 ROLE.local
 __pycache__/
+*.pyc
 .venv/
+venv/
 calib.npz
 calib_approx.npz
 calibration_frames/
