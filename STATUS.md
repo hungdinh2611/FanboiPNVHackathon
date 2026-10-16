@@ -29,3 +29,5 @@ Chạy P3: `.\.venv\Scripts\python.exe main.py --synthetic`; live sau hiệu chu
 
 P1 -> P4: đã kiểm thấy Q&A P1 câu 3 đang đồng nhất yaw>60 với ambiguous. Cần sửa cách nói: ambiguity thường do marker nhỏ/xa, phép chiếu gần affine; yaw lớn có thể co ngắn/mất góc và KHÔNG bảo đảm luôn ambiguous. Chỉ nói phản ứng đã quan sát trên ca lỗi thật. Bảng MAE theo z/yaw trong evaluate.py hiện lấy tập found trước khi tính found_%, nên cột found_% trong hai bảng luôn 100%; khi có dropout cần tính tỉ lệ từ toàn bộ grid tương ứng. P1 giữ quy tắc không tự sửa file P4.
 
+[2026-10-16 15:20 Asia/Saigon] P1 Đinh Bảo Hưng - python run_demo.py --check PASS toàn bộ P1/P2 và tích hợp; fallback camera lỗi -> video PASS. Đã chạy cửa sổ OpenCV thật thêm 45 frame webcam, kết thúc bình thường; không lưu ảnh/video webcam. Review Standards: 0 lỗi mới; Spec: 0 lỗi mới, vẫn thiếu nghiệm thu vật lý đã ghi. Đã lấy cập nhật revert ảnh thành viên (455c971), không sửa file P2/P3/P4 - Lệnh bàn giao: python run_demo.py (webcam với calib_approx.npz có cảnh báo), hoặc python run_demo.py --synthetic - Sẵn sàng chạy phần mềm, chưa được tuyên bố đạt sai số thước hay có GT/video live dự phòng.
+
