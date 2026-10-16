@@ -1,0 +1,6 @@
+ROLE.local
+__pycache__/
+.venv/
+calib.npz
+calib_approx.npz
+calibration_frames/
