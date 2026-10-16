@@ -10,8 +10,9 @@ vật lý. Số dưới đây lấy từ video marker render bằng camera ảo 
 Hiệu chuẩn tìm tiêu cự theo pixel, tâm ảnh và hệ số méo ống kính bằng một bàn cờ có kích thước biết trước.
 Không có các số này thì không đổi được pixel sang cm. RMS là độ lệch trung bình (pixel) giữa góc bàn cờ đo được
 và góc chiếu lại từ mô hình. Mục tiêu là dưới 0.6 px. RMS nhỏ mới là điều kiện cần: vẫn phải kiểm bằng thước,
-vì bản in sai kích thước thì RMS vẫn nhỏ nhưng cm sai. Nói thẳng: nhóm **chưa hiệu chuẩn webcam thật**.
-Demo mô phỏng dùng K của camera ảo (biết chính xác); chạy webcam thì dùng K ước lượng từ HFOV 68 độ, nên cm chưa kiểm chứng.
+vì bản in sai kích thước thì RMS vẫn nhỏ nhưng cm sai. Camera Hưng: **RMS 0.226114 px**, 15 ảnh,
+1280×720 (`data/calibration_hung.npz`); chưa có phép kiểm sai số cm bằng thước.
+Demo mô phỏng dùng K của camera ảo; webcam máy khác phải hiệu chuẩn riêng, không dùng file của Hưng.
 
 **2. Vì sao một camera mà đo được khoảng cách?**
 Vì biết trước cạnh marker là 6 cm. Ảnh marker càng nhỏ thì càng xa (u ≈ f·s/z). PnP giải tư thế 3D
