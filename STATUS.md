@@ -43,3 +43,5 @@ P4 -> P1 (ưu tiên CAO): nhìn thẳng (yaw≈0) bị ambiguous 17-80% frame (h
 P4 -> P2 (ưu tiên CAO): thẻ dịch nhanh (yaw +20 độ hoặc z +30 cm giữa 2 frame) thì gating loại MỌI phép đo, HUD đứng giá trị cũ + LOST tới 2 s dù thấy marker (rủi ro khi giám khảo cầm thẻ). Đề xuất: 5 frame liên tiếp bị loại nhưng nhất quán (lệch < 3 sigma đo) thì khởi tạo lại. Patch đã thử (test_filter PASS, outlier lẻ vẫn bị loại): report/proposals/p2_reinit_after_consistent_gating.patch. Áp cả 2 patch: run_demo.py --check PASS trên OpenCV 5.0; test_p4_e2e KF GOOD từ 4/12 lên 11/12 tư thế (P08 z100 yaw20 là lật nghiệm thật, đúng là DEGRADED).
 
 P4 -> P3 (nhỏ): chữ vàng "CALIB FOV UOC LUONG" khó đọc trên nền ảnh sáng; nên có nền tối sau chữ.
+
+[2026-10-16 15:52 Asia/Saigon] P4 Linh (máy Đạo) - Xong bộ slide 10 trang (link trong report/slides_outline.md), số đo để [__]. Hai patch P1/P2 trong report/proposals/ VẪN CHƯA áp: P4 không được sửa file của P1/P2; Hưng/Việt vui lòng git apply rồi chạy python run_demo.py --check và python test_p4_e2e.py.

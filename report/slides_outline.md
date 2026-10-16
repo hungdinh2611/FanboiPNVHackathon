@@ -9,3 +9,5 @@
 | 6:15-6:40 | 5. Ca lỗi và giới hạn | P4 | Ca yaw lớn hơn 60 độ hoặc lóa: hiện tượng, nguyên nhân, phản ứng. Giới hạn: marker, một camera, z 30-100 cm, sai số thước. |
 | 6:40-7:00 | 6. Impact và lộ trình | P4 | Công thức, kịch bản cơ sở (giả định), lộ trình: thay marker bằng detector học được, rồi gắn vào robot sạc. |
 | 7:00-10:00 | Hỏi đáp | Cả nhóm | Mỗi người trả lời câu về phần mình (`Q&A.md`). |
+
+Bộ slide (10 slide, ô [__] chờ số đo thật): https://claude.ai/artifact/K2e6JWHpJS3EnrS1EoBcVD — chủ sở hữu cần chia sẻ từ menu Share thì người khác mới mở được.
