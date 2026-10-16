@@ -106,6 +106,8 @@ class GuidanceGenerator:
                 self._z_ok = True
 
         if self._is_aligned:
+            if status == "DEGRADED":
+                return "DO TIN CAY THAP - GIU NGUYEN", False
             return "DA CAN CHINH - SAN SANG CAM SAC", True
 
         parts: list[str] = []
