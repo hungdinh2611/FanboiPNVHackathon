@@ -1,0 +1,31 @@
+diff --git a/filter.py b/filter.py
+index 5211950..32de326 100644
+--- a/filter.py
++++ b/filter.py
+@@ -83,6 +83,7 @@ class AlignmentKF:
+         self.last_t_capture: float | None = None
+         self.last_valid_obs_t: float | None = None
+         self.last_mahalanobis_sq: float = 0.0
++        self.rejected: list = []  # cac quan sat lien tiep bi gate loai
+         self.guidance_gen.reset()
+ 
+     def _build_F_and_Q(self, dt: float) -> tuple[np.ndarray, np.ndarray]:
+@@ -304,8 +305,18 @@ class AlignmentKF:
+                 I_KH = np.eye(6, dtype=np.float64) - (K @ self.H)
+                 self.P = I_KH @ self.P @ I_KH.T + K @ R @ K.T
+                 self.last_valid_obs_t = t_cap
++                self.rejected = []
+             else:
+                 rejected_by_gate = True
++                # Outlier that thi le te va lung tung. Neu 5 frame lien tiep bi loai NHUNG nhat quan voi nhau
++                # (lech nhau < 3 sigma do) thi chinh du doan da sai (the bi dich nhanh) -> khoi tao lai o frame sau.
++                # Nghiem PnP lat qua lat lai khong nhat quan nen khong kich hoat.
++                self.rejected = (self.rejected + [z_meas])[-5:]
++                if len(self.rejected) == 5:
++                    spread = np.ptp(np.array(self.rejected), axis=0)
++                    if np.all(spread < 3.0 * np.sqrt(np.diag(R))):
++                        self.initialized = False
++                        self.rejected = []
+                 # Nếu bị gate liên tiếp (ví dụ vật thể vừa đổi vận tốc đột ngột), giảm vận tốc dự đoán
+                 self.x[3:6] *= 0.50
+ 

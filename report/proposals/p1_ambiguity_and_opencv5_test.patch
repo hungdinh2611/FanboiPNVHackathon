@@ -1,0 +1,64 @@
+diff --git a/perception.py b/perception.py
+index da6ae8d..84df002 100644
+--- a/perception.py
++++ b/perception.py
+@@ -17,6 +17,16 @@ import numpy as np
+ from contract import Observation
+ 
+ 
++AMBIGUOUS_YAW_GAP_DEG = 12.0
++
++
++def _yaw_deg(R):
++    normal = R[:, 2].copy()
++    if normal[2] > 0:
++        normal = -normal
++    return float(np.degrees(np.arctan2(normal[0], -normal[2])))
++
++
+ class Perceiver:
+     def __init__(self, calib_path, marker_id=7, marker_side_cm=6.0):
+         version = tuple(int(part) for part in cv2.__version__.split('.')[:2])
+@@ -122,12 +132,11 @@ class Perceiver:
+             return missing(image_points)
+         candidates.sort(key=lambda item: item[0])
+         error, rvec, tvec, R = candidates[0]
++        yaw = _yaw_deg(R)
++        # Mo ho chi nguy hiem khi hai nghiem KHAC NHAU that: nhin thang, hai nghiem chi lech vai do.
+         ambiguous = bool(matches.size > 1 or (len(candidates) > 1 and
+-                         (candidates[1][0] - error) / max(error, 1e-9) < 0.20))
+-        normal = R[:, 2].copy()
+-        if normal[2] > 0:
+-            normal = -normal
+-        yaw = float(np.degrees(np.arctan2(normal[0], -normal[2])))
++                         (candidates[1][0] - error) / max(error, 1e-9) < 0.20 and
++                         abs(_yaw_deg(candidates[1][3]) - yaw) > AMBIGUOUS_YAW_GAP_DEG))
+         return Observation(t_capture=t_capture, t_detect_done=time.perf_counter(), found=True,
+                            x_cm=float(tvec.reshape(3)[0]), z_cm=float(tvec.reshape(3)[2]),
+                            yaw_deg=yaw, reproj_err_px=error, ambiguous=ambiguous,
+diff --git a/test_perception.py b/test_perception.py
+index 483246d..7de98a6 100644
+--- a/test_perception.py
++++ b/test_perception.py
+@@ -114,7 +114,11 @@ class PerceptionTests(unittest.TestCase):
+     def test_two_indistinguishable_solutions_are_ambiguous(self):
+         rvec, tvec = pose_rotation(25), np.array([[4.], [0.], [50.]])
+         with patch('perception.cv2.solvePnPGeneric', return_value=(2, [rvec, rvec], [tvec, tvec], None)):
+-            self.assertTrue(self.observation_at().ambiguous)
++            # Hai nghiem cung sai so chieu lai va CUNG yaw: vo hai, khong bao ambiguous.
++            self.assertFalse(self.observation_at().ambiguous)
++            # Khi hai nghiem lech yaw vuot nguong thi phai bao ambiguous.
++            with patch('perception.AMBIGUOUS_YAW_GAP_DEG', -1.0):
++                self.assertTrue(self.observation_at().ambiguous)
+ 
+     def test_invalid_and_behind_camera_solutions_are_rejected(self):
+         rvec = pose_rotation(25)
+@@ -194,7 +198,7 @@ class PerceptionTests(unittest.TestCase):
+         generate_patterns(self.root)
+         marker = cv2.imread(str(self.root / 'marker_7.png'))
+         corners, ids, _ = self.perceiver.detector.detectMarkers(marker)
+-        np.testing.assert_array_equal(ids, [[7]])
++        np.testing.assert_array_equal(np.asarray(ids).reshape(-1), [7])  # OpenCV 5 tra (1,)
+         self.assertEqual(len(corners), 1)
+         board = cv2.imread(str(self.root / 'checkerboard_9x6.png'))
+         self.assertIsNotNone(find_corners(board))

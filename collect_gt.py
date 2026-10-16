@@ -5,7 +5,9 @@ Du lieu gia (test evaluate.py khong can webcam):
            python collect_gt.py --synthetic --out data/gt_runs_synthetic.csv
 
 Phim (live): SPACE chup 30 frame | N/P tu the tiep/truoc | E nhap GT thuc do | K dat nhan ca loi | Q thoat
-Mot Kalman chay lien tuc suot phien de da hoi tu truoc khi chup; raw lay thang tu Observation.
+Mot Kalman chay lien tuc suot phien; raw lay thang tu Observation.
+Voi tu the luoi, SPACE chi "len co": chup bat dau khi KF da GOOD on dinh (STABLE_N frame).
+Ca loi (K) chup ngay, vi muc dich la ghi lai phan ung cua he thong.
 """
 import argparse
 import csv
@@ -25,6 +27,8 @@ FIELDS = ["pose_id", "case", "gt_x", "gt_z", "gt_yaw",
           "est_kf_x", "est_kf_z", "est_kf_yaw", "sigma_x", "sigma_z", "sigma_yaw",
           "reproj_err", "ambiguous", "status", "latency_total_ms", "t"]
 N_SHOT = 30
+STABLE_N = 15     # SPACE chi bat dau chup khi KF GOOD lien tiep 15 frame (tranh chup luc KF chua bat kip)
+ARM_TIMEOUT = 150  # ~5 s o 30 fps: qua han thi van chup va canh bao
 
 
 def make_row(pose, case, obs: Observation, st: State):
@@ -90,6 +94,8 @@ def run_live(args):
     f, w = open_writer(args.out)
     idx, case, pose = 0, "grid", GRID[0]
     shot_left = 0
+    armed = 0          # so frame da cho ke tu khi nhan SPACE (0 = chua len co)
+    good_streak = 0
     while True:
         if not cap.grab():
             print("Mat frame, thoat.")
@@ -100,6 +106,14 @@ def run_live(args):
             continue
         obs = perceiver.process(frame, t_cap)
         st = kf.update(obs)
+        good_streak = good_streak + 1 if st.status == "GOOD" else 0
+
+        if armed:
+            armed += 1
+            if case != "grid" or good_streak >= STABLE_N or armed > ARM_TIMEOUT:
+                if case == "grid" and good_streak < STABLE_N:
+                    print(f"  CANH BAO {pose[0]}: KF chua GOOD on dinh sau {ARM_TIMEOUT} frame, van chup")
+                shot_left, armed = N_SHOT, 0
 
         if shot_left > 0:
             w.writerow(make_row(pose, case, obs, st))
@@ -117,7 +131,9 @@ def run_live(args):
              f"{' AMBIG' if obs.ambiguous else ''}") if obs.found else "RAW  khong thay marker id 7",
             f"KF   x={st.x_cm:6.2f} z={st.z_cm:6.2f} yaw={st.yaw_deg:6.1f}  "
             f"sig={st.sigma_x:.2f}/{st.sigma_z:.2f}/{st.sigma_yaw:.1f}  {st.status}",
-            f"DANG CHUP {shot_left}" if shot_left else "SPACE chup | N/P tu the | E sua GT | K ca loi | Q thoat",
+            f"DANG CHUP {shot_left}" if shot_left else
+            (f"CHO KALMAN ON DINH {good_streak}/{STABLE_N}" if armed else
+             "SPACE chup | N/P tu the | E sua GT | K ca loi | Q thoat"),
         ]
         for j, s in enumerate(lines):
             cv2.putText(frame, s, (15, 35 + 32 * j), cv2.FONT_HERSHEY_SIMPLEX, 0.75, color, 2)
@@ -126,10 +142,10 @@ def run_live(args):
         key = cv2.waitKey(1) & 0xFF
         if key in (ord("q"), 27):
             break
-        if shot_left:
-            continue  # khong doi tu the khi dang chup
+        if shot_left or armed:
+            continue  # khong doi tu the khi dang cho/chup
         if key == ord(" "):
-            shot_left = N_SHOT
+            armed = 1
         elif key in (ord("n"), ord("p")):
             idx = (idx + (1 if key == ord("n") else -1)) % len(GRID)
             pose, case = GRID[idx], "grid"

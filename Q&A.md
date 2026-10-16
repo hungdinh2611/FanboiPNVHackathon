@@ -21,6 +21,8 @@ Marker phẳng ở xa hoặc ảnh nhỏ thì phép chiếu gần như affine: h
 IPPE trả về cả hai nghiệm. Nếu lỗi chiếu lại của hai nghiệm chênh dưới 20% thì bật `ambiguous=True` và chuyển DEGRADED.
 Nghiêng lớn (hơn 60 độ) KHÔNG bảo đảm lúc nào cũng ambiguous. Nó làm marker co ngắn, góc khó tìm, có thể mất
 nhận diện hoặc reproj error tăng. Chỉ nói phản ứng đã thấy trên ca lỗi thật: `[điền từ bảng ca lỗi metrics.md]`.
+Trên video render, mơ hồ thật xuất hiện ở z = 100 cm, yaw = 20 độ (yaw nhảy giữa +19 và −19). Còn nhìn thẳng thì hai nghiệm
+chỉ lệch vài độ, mơ hồ vô hại (xem `report/failure_cases.md`, đây là dữ liệu render, không phải bằng chứng).
 
 ## P2 — Việt (Bất định, Thời gian)
 

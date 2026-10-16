@@ -47,7 +47,9 @@ Ground truth là số ĐO ĐƯỢC, không phải số dự định.
 ## Thu dữ liệu mỗi tư thế
 
 1. Đặt thẻ, buông tay, chờ 2 s cho thẻ hết rung và Kalman hội tụ.
-2. Nhấn SPACE: chương trình lấy 30 Observation liên tiếp (raw + Kalman + sigma + latency), ghi `data/gt_runs.csv`.
+2. Nhấn SPACE: màn hình hiện `CHO KALMAN ON DINH x/15`. Khi Kalman GOOD liên tục 15 frame, chương trình tự lấy
+   30 Observation liên tiếp (raw + Kalman + sigma + latency) và ghi `data/gt_runs.csv`. Quá 5 s chưa ổn định thì
+   vẫn chụp và in CANH BAO ra terminal; ghi lại tư thế đó. Ca lỗi (K) thì chụp ngay, không chờ.
 3. Nhấn N sang tư thế tiếp theo. Một người đặt thẻ, một người bấm máy và đọc to số.
 
 ## Ca lỗi có chủ đích (giai đoạn 2)
