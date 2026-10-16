@@ -2,3 +2,4 @@
 
 Đinh Bảo Hưng - 2A202602524 -> P1 (Hình học và Perception)
 Ngô Thế Việt - 2A202602594 -> P2 (Bất định, Thời gian, Guidance)
+Nguyễn Khánh Đô - 2A202602687 -> P3 (Demo app, UI và ghép hệ thống)

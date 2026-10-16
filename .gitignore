@@ -6,3 +6,5 @@ venv/
 calib.npz
 calib_approx.npz
 calibration_frames/
+/video*.mp4
+/log*.csv
