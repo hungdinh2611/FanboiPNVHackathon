@@ -12,3 +12,5 @@ Yêu cầu tích hợp P3: dùng Perceiver('calib.npz') hoặc chỉ rõ calib_a
 
 
 [2026-10-16 15:06 Asia/Saigon] P4 Linh (máy Đạo) - Xong protocol.md (lưới 12 tư thế, bước thống nhất dấu x/yaw với P1, sai số GT ±2 mm/±2 độ), collect_gt.py (live: SPACE chụp 30 frame raw+KF+sigma+latency, E sửa GT thực đo, K gắn nhãn ca lỗi; --synthetic dùng synthetic.py của P2), evaluate.py (MAE/p95 theo z và yaw, biểu đồ, std đứng yên raw/MAD/KF, tỉ lệ trong ±2 sigma, latency p50/p95, bảng ca lỗi). Đã chạy hết pipeline trên dữ liệu GIẢ (report/metrics_synthetic.md) - KHÔNG phải bằng chứng - Tiếp: chờ calib.npz thật của P1, đo chung dấu yaw, thu data/gt_runs.csv và 3 ca lỗi - Vướng: chưa có calib.npz, chưa thử collect_gt.py với webcam thật.
+
+[2026-10-16 15:10 Asia/Saigon] P4 Linh (máy Đạo) - Xong impact.md (công thức, 3 kịch bản đều là GIẢ ĐỊNH, lộ trình, rủi ro), Q&A.md (3 câu mỗi vai, chỗ [điền số thật] chờ dữ liệu thật), report/slides_outline.md - Tiếp: thu GT thật khi có calib.npz - Mời mỗi người đọc phần mình trong Q&A.md.
