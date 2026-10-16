@@ -17,6 +17,20 @@ import numpy as np
 from contract import Observation
 
 
+AMBIGUOUS_YAW_GAP_DEG = 12.0  # Demo heuristic; not a confidence bound.
+
+
+def _yaw_deg(R):
+    normal = R[:, 2].copy()
+    if normal[2] > 0:
+        normal = -normal
+    return float(np.degrees(np.arctan2(normal[0], -normal[2])))
+
+
+def _direction(value, tolerance):
+    return 0 if abs(value) < tolerance else (1 if value > 0 else -1)
+
+
 class Perceiver:
     def __init__(self, calib_path, marker_id=7, marker_side_cm=6.0):
         version = tuple(int(part) for part in cv2.__version__.split('.')[:2])
@@ -32,6 +46,8 @@ class Perceiver:
             raw_size = np.asarray(calibration['image_size'])
             self.approximate = ('method' in calibration and
                                 str(calibration['method'].item()) == 'approx_fov')
+            self.synthetic_calibration = ('method' in calibration and
+                                           str(calibration['method'].item()) == 'synthetic_render')
         if (self.K.shape != (3, 3) or not np.isfinite(self.K).all()
                 or min(self.K[0, 0], self.K[1, 1]) <= 0
                 or not np.allclose(self.K[2], [0, 0, 1])):
@@ -72,7 +88,9 @@ class Perceiver:
         """Return found=False for no target/invalid PnP; preserve perf_counter timestamp.
 
         reproj_err_px is mean Euclidean pixel error over the four corners.
-        ambiguous=True if (second_error-best_error)/max(best_error,1e-9)<0.20.
+        Equal-error solutions (<20% gap) are ambiguous when their correction
+        directions differ, x/z differ by >1 cm, or yaw differs by >12 degrees.
+        Nearly identical solutions with the same guidance are harmless.
         Duplicate target IDs also mark ambiguity. K follows the current frame
         resolution so P3 may use self.K/self.dist with cv2.drawFrameAxes.
         """
@@ -122,14 +140,23 @@ class Perceiver:
             return missing(image_points)
         candidates.sort(key=lambda item: item[0])
         error, rvec, tvec, R = candidates[0]
-        ambiguous = bool(matches.size > 1 or (len(candidates) > 1 and
-                         (candidates[1][0] - error) / max(error, 1e-9) < 0.20))
-        normal = R[:, 2].copy()
-        if normal[2] > 0:
-            normal = -normal
-        yaw = float(np.degrees(np.arctan2(normal[0], -normal[2])))
+        yaw = _yaw_deg(R)
+        ambiguous = matches.size > 1
+        if len(candidates) > 1 and (candidates[1][0] - error) / max(error, 1e-9) < 0.20:
+            other_yaw = _yaw_deg(candidates[1][3])
+            position, other_position = tvec.reshape(3), candidates[1][2].reshape(3)
+            # P4's near-frontal fix, with guards at the default guidance bands:
+            # never suppress two solutions that disagree on readiness/direction.
+            ambiguous |= (abs(other_yaw - yaw) > AMBIGUOUS_YAW_GAP_DEG
+                          or _direction(yaw, 5) != _direction(other_yaw, 5)
+                          or _direction(yaw, 7.5) != _direction(other_yaw, 7.5)
+                          or _direction(position[0], 1) != _direction(other_position[0], 1)
+                          or _direction(position[0], 1.5) != _direction(other_position[0], 1.5)
+                          or np.any(np.abs(position[[0, 2]] - other_position[[0, 2]]) > 1)
+                          or any((position[2] <= boundary) != (other_position[2] <= boundary)
+                                 for boundary in (8, 15, 17.25)))
         return Observation(t_capture=t_capture, t_detect_done=time.perf_counter(), found=True,
                            x_cm=float(tvec.reshape(3)[0]), z_cm=float(tvec.reshape(3)[2]),
-                           yaw_deg=yaw, reproj_err_px=error, ambiguous=ambiguous,
+                           yaw_deg=yaw, reproj_err_px=error, ambiguous=bool(ambiguous),
                            corners=image_points.astype(np.float32),
                            rvec=rvec.copy(), tvec=tvec.copy())

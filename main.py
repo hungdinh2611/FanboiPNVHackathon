@@ -371,6 +371,8 @@ def render(packet, obs, state, perceiver, fps, latency, kind, enabled, stub, rec
     cv2.rectangle(canvas, (6, 6), (WIDTH-7, 177), (22, 26, 34), -1)
     banner = ('DU LIEU GIA - KHONG PHAI LIVE' if kind == 'SYNTHETIC'
               else 'VIDEO DA GHI - KHONG PHAI LIVE' if kind == 'VIDEO' else 'CAMERA LIVE')
+    if getattr(perceiver, 'synthetic_calibration', False) or recorded_kind == 'SYNTHETIC_RENDER':
+        banner = 'VIDEO MO PHONG - ARUCO/PNP THAT - KHONG PHAI LIVE'
     put(canvas, banner + (' | REPLAY CSV' if replay else ''), (20, 35), 0.72,
         (80, 80, 255) if kind != 'LIVE' else color, 2)
     mode = 'RAW TAM - CHUA CO P2 / SIGMA KHONG CO' if stub else ('KALMAN ON' if enabled else 'RAW / KALMAN OFF')
@@ -403,6 +405,7 @@ def render(packet, obs, state, perceiver, fps, latency, kind, enabled, stub, rec
     flags = ('REC ' if recording else '') + ('FROZEN ' if frozen else '')
     put(canvas, flags + notice, (20, 692), 0.55, (90, 180, 255))
     if perceiver is not None and getattr(perceiver, 'approximate', False):
+        cv2.rectangle(canvas, (12, 184), (670, 218), (22, 26, 34), -1)
         put(canvas, 'CALIB FOV UOC LUONG - CHUA KIEM CHUNG', (20, 210), 0.62, COLORS['DEGRADED'], 2)
     return canvas
 
@@ -416,6 +419,7 @@ def build_parser():
     parser.add_argument('--fallback', default='video.mp4', help='Backup video on webcam failure')
     parser.add_argument('--replay', help='P3 CSV paired with --source video')
     parser.add_argument('--synthetic', action='store_true', help='Explicit synthetic UI demo, not real evidence')
+    parser.add_argument('--loop', action='store_true', help='Repeat video until Q (requires a video source)')
     parser.add_argument('--record', action='store_true', help='Start recording immediately')
     parser.add_argument('--video-out', default='video.mp4')
     parser.add_argument('--log-out', default='log.csv')
@@ -429,7 +433,9 @@ def run(args):
     source = int(args.source) if args.source.isdigit() else args.source
     if args.replay and (isinstance(source, int) or args.synthetic):
         raise ValueError('--replay requires --source video.mp4, without --synthetic')
-    if args.headless and args.max_frames is None and (args.synthetic or isinstance(source, int)):
+    if args.loop and (args.replay or args.synthetic or isinstance(source, int)):
+        raise ValueError('--loop requires a video source without --replay/--synthetic')
+    if args.headless and args.max_frames is None and (args.synthetic or isinstance(source, int) or args.loop):
         raise ValueError('Use --max-frames with a headless live/synthetic source')
     if args.max_frames is not None and args.max_frames <= 0:
         raise ValueError('--max-frames must be positive')
@@ -450,6 +456,7 @@ def run(args):
     want_record = args.record
     frozen = False
     count = 0
+    cycle_start_count = 0
     latencies = deque(maxlen=300)
     completions = deque(maxlen=120)
     last_packet_at = time.perf_counter()
@@ -489,6 +496,19 @@ def run(args):
                     if capture.error:
                         raise OSError(capture.error)
                     if capture.done:
+                        if args.loop:
+                            if count == cycle_start_count:
+                                raise OSError('Cannot loop an empty video')
+                            cycle_start_count = count
+                            repeat_source = capture.source
+                            capture.close()
+                            capture = Capture(repeat_source)
+                            estimator, stub = load_filter()
+                            last_packet_at = time.perf_counter()
+                            latencies.clear()
+                            completions.clear()
+                            notice = 'VIDEO LAP LAI / Q DE THOAT'
+                            continue
                         if replay and count != len(replay.rows):
                             raise ValueError('Video ended before all replay CSV rows were consumed')
                         print('End of video.')
@@ -545,7 +565,9 @@ def run(args):
                         print(notice)
                     want_record = False
                 if recorder is not None:
-                    recorder.write(packet, obs, state, enabled, recorded_kind if replay else capture.kind)
+                    original_kind = ('SYNTHETIC_RENDER' if getattr(perceiver, 'synthetic_calibration', False)
+                                     else capture.kind)
+                    recorder.write(packet, obs, state, enabled, recorded_kind if replay else original_kind)
                 count += 1
                 if args.max_frames and count >= args.max_frames:
                     break

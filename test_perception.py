@@ -111,10 +111,30 @@ class PerceptionTests(unittest.TestCase):
         expected = np.mean(np.linalg.norm(projected.reshape(4, 2) - obs.corners, axis=1))
         self.assertAlmostEqual(obs.reproj_err_px, expected, places=7)
 
-    def test_two_indistinguishable_solutions_are_ambiguous(self):
+    def test_identical_solutions_are_not_actionably_ambiguous(self):
         rvec, tvec = pose_rotation(25), np.array([[4.], [0.], [50.]])
         with patch('perception.cv2.solvePnPGeneric', return_value=(2, [rvec, rvec], [tvec, tvec], None)):
-            self.assertTrue(self.observation_at().ambiguous)
+            self.assertFalse(self.observation_at().ambiguous)
+
+    def test_equal_error_solutions_preserve_guidance_disagreements(self):
+        # Score actual projections against their midpoint: both errors are equal.
+        for yaw_a, yaw_b, other_x, expected in (
+                (2, -2, 0, False), (20, -20, 0, True),
+                (4, -7, 0, True), (6, -6, 0, True), (6, 8, 0, True), (2, -2, 3, True)):
+            with self.subTest(yaw_a=yaw_a, yaw_b=yaw_b, other_x=other_x):
+                rotations = [pose_rotation(yaw_a), pose_rotation(yaw_b)]
+                translations = [np.array([[0.], [0.], [50.]]),
+                                np.array([[float(other_x)], [0.], [50.]])]
+                projections = [cv2.projectPoints(self.perceiver.object_points, r, t,
+                                                self.K, self.perceiver.dist)[0]
+                               for r, t in zip(rotations, translations)]
+                points = ((projections[0] + projections[1]) / 2).astype(np.float32).reshape(1, 4, 2)
+                with patch.object(self.perceiver, 'detector') as detector:
+                    detector.detectMarkers.return_value = ([points], np.array([[7]]), [])
+                    with patch('perception.cv2.solvePnPGeneric',
+                               return_value=(2, rotations, translations, None)):
+                        obs = self.perceiver.process(self.frame, time.perf_counter())
+                self.assertEqual(obs.ambiguous, expected)
 
     def test_invalid_and_behind_camera_solutions_are_rejected(self):
         rvec = pose_rotation(25)
@@ -194,7 +214,7 @@ class PerceptionTests(unittest.TestCase):
         generate_patterns(self.root)
         marker = cv2.imread(str(self.root / 'marker_7.png'))
         corners, ids, _ = self.perceiver.detector.detectMarkers(marker)
-        np.testing.assert_array_equal(ids, [[7]])
+        np.testing.assert_array_equal(np.asarray(ids).reshape(-1), [7])
         self.assertEqual(len(corners), 1)
         board = cv2.imread(str(self.root / 'checkerboard_9x6.png'))
         self.assertIsNotNone(find_corners(board))

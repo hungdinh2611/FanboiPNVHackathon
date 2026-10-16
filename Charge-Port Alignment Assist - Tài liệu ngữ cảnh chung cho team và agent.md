@@ -278,3 +278,18 @@ Bạn là kỹ sư đánh giá và làm tài liệu. Giai đoạn 1 chưa cần 
 - Mỗi thành viên trả lời được vì sao team chọn cách làm này.
 - Nói được người dùng là ai và họ được gì.
 - Có một ước lượng tác động nếu triển khai ở Vin, dù chỉ là phép tính đơn giản.
+
+## 10. Cập nhật theo ủy quyền Hưng: không kịp in
+
+Hưng đã ủy quyền agent hoàn tất cả sửa tích hợp P1/P2/P3 cần thiết. Giữ nguyên
+`contract.py`. Chạy `python run_demo.py --no-print`: video marker render đi qua
+ArUco, PnP và Kalman thật, có nhãn mô phỏng, không cần webcam hoặc bàn cờ.
+K/GT thuộc camera ảo, không được dùng như số đo thước hay hiệu chuẩn camera thật.
+Hướng dẫn hiện hành: `NO_PRINT_DEMO.md`.
+
+Áp dụng đề xuất P4: không báo ambiguous với hai nghiệm tương đương về chỉ dẫn.
+Khi lỗi chiếu lại chênh dưới 20%, vẫn báo nếu yaw chênh hơn 12 độ (heuristic demo),
+x/z chênh hơn 1 cm hoặc hai nghiệm vượt các ngưỡng chỉ dẫn mặc định/hysteresis khác nhau.
+Các ngưỡng này tương ứng guidance mặc định; đổi ngưỡng guidance cần cập nhật kiểm tra P1.
+Filter bám lại khi 5 quan sát liên tiếp bị gate nhưng chất lượng tốt và nhất quán;
+không dùng ambiguous, mất marker hoặc reprojection error cao để kích hoạt bám lại.

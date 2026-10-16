@@ -98,6 +98,11 @@ class IntegrationTests(unittest.TestCase):
             '--headless', '--max-frames', '5',
         ])
         self.assertEqual(app.run(fallback_args), 5)
+        loop_args = app.build_parser().parse_args([
+            '--source', str(source), '--calib', str(calibration),
+            '--loop', '--headless', '--max-frames', '55',
+        ])
+        self.assertEqual(app.run(loop_args), 55)
 
     def test_p4_collection_and_evaluation(self):
         path = self.root / 'gt_runs_synthetic.csv'

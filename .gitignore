@@ -8,3 +8,4 @@ calib_approx.npz
 calibration_frames/
 /video*.mp4
 /log*.csv
+/demo_assets/

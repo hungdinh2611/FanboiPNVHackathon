@@ -2,6 +2,7 @@
 
 python run_demo.py                         # webcam, measured K or labelled FOV fallback
 python run_demo.py --synthetic             # camera-free demo, visibly labelled
+python run_demo.py --no-print              # rendered video -> REAL ArUco/PnP/Kalman
 python run_demo.py --check                 # P1/P2 and full integration checks
 All other options are passed to main.py, e.g. --headless --max-frames 60.
 """
@@ -16,11 +17,29 @@ ROOT = Path(__file__).resolve().parent
 
 def main():
     options = sys.argv[1:]
+    if '--once' in options and '--no-print' not in options:
+        print('--once is used with --no-print.', file=sys.stderr)
+        return 2
+    if '--no-print' in options:
+        options.remove('--no-print')
+        once = '--once' in options
+        if once:
+            options.remove('--once')
+        conflicts = ('--source', '--calib', '--synthetic', '--replay')
+        if any(arg == flag or arg.startswith(flag + '=') for arg in options for flag in conflicts):
+            print('--no-print chooses its own rendered video and virtual calibration.', file=sys.stderr)
+            return 2
+        from prepare_demo import prepare_assets
+        paths = prepare_assets()
+        print('DEMO MO PHONG: real image processing, virtual camera and ground truth.', flush=True)
+        options += ['--source', str(paths['video']), '--calib', str(paths['calib'])]
+        if not once and '--loop' not in options:
+            options += ['--loop']
     if '--check' in options:
         if options != ['--check']:
             print('Use --check alone. For demo options: python run_demo.py --help', file=sys.stderr)
             return 2
-        for command in [('test_perception.py', '--self-test'), ('test_filter.py',),
+        for command in [('test_perception.py', '--self-test'), ('test_filter.py',), ('test_recovery.py',),
                         ('test_integration.py',)]:
             result = subprocess.run([sys.executable, *command], cwd=ROOT)
             if result.returncode:

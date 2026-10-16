@@ -43,3 +43,20 @@
 | fail_glare | `[điền]` | `[điền]` | `[điền]` |
 | fail_yaw70 | `[điền]` | `[điền]` | `[điền]` |
 | fail_occlude hoặc fail_blur | `[điền]` | `[điền]` | `[điền]` |
+
+## C. Cập nhật bản không cần in (Hưng ủy quyền sửa tích hợp)
+
+Hai đề xuất A3/A4 đã được P1 áp dụng, có bổ sung kiểm soát: giữ ambiguous khi hai
+nghiệm khác hướng chỉnh hoặc vượt các ngưỡng mặc định/hysteresis khác nhau; chỉ
+khởi tạo lại KF từ chuỗi 5 quan sát liên tiếp chất lượng tốt, không ambiguous.
+Quan sát mất, lỗi cao hoặc đứt thời gian ngắt chuỗi. Contract không đổi.
+
+Chạy lại `test_p4_e2e.py` trên OpenCV 4.9: raw PASS các tư thế ổn định đã định nghĩa;
+11/12 tư thế đạt GOOD >=90%. **P08 vẫn lỗi yaw** (median raw khoảng 38.18°, ambiguous
+60%, GOOD 23%). Đây là lỗi mô phỏng còn giữ nguyên để giải thích giới hạn, không loại bỏ
+khỏi báo cáo và không suy thành độ chính xác camera thật.
+
+Bản chạy không in: `python run_demo.py --no-print`. Có thêm các đoạn che góc, mờ
+và lóa được tạo có chủ đích trong ảnh; số kiểm tra lưu ở
+`demo_assets/validation_render.md`, tất cả đều gắn nhãn mô phỏng. Phần B vẫn chưa
+được đo trên thẻ in thật.

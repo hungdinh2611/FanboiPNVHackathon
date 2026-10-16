@@ -18,7 +18,9 @@ nhiều cm hơn. Bảng lỗi theo z cho thấy điều đó: `[điền số th�
 
 **3. Khi nào hệ thống báo ambiguous? Nghiêng lớn thì sao?**
 Marker phẳng ở xa hoặc ảnh nhỏ thì phép chiếu gần như affine: hai tư thế nghiêng ngược nhau cho ảnh gần giống nhau.
-IPPE trả về cả hai nghiệm. Nếu lỗi chiếu lại của hai nghiệm chênh dưới 20% thì bật `ambiguous=True` và chuyển DEGRADED.
+IPPE trả về cả hai nghiệm. Nếu lỗi chiếu lại chênh dưới 20% và hai nghiệm khác đáng kể về tư thế/chỉ dẫn
+thì bật `ambiguous=True` và chuyển DEGRADED. Bản sửa P1 không báo khi hai nghiệm gần trùng và cùng hướng chỉnh;
+vẫn báo nếu yaw lệch hơn 12 độ, khác hướng chỉnh hoặc x/z lệch hơn 1 cm. 12 độ là heuristic demo.
 Nghiêng lớn (hơn 60 độ) KHÔNG bảo đảm lúc nào cũng ambiguous. Nó làm marker co ngắn, góc khó tìm, có thể mất
 nhận diện hoặc reproj error tăng. Chỉ nói phản ứng đã thấy trên ca lỗi thật: `[điền từ bảng ca lỗi metrics.md]`.
 Trên video render, mơ hồ thật xuất hiện ở z = 100 cm, yaw = 20 độ (yaw nhảy giữa +19 và −19). Còn nhìn thẳng thì hai nghiệm

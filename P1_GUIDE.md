@@ -1,5 +1,8 @@
 # P1 — Đinh Bảo Hưng
 
+**Không kịp in:** chạy `python run_demo.py --no-print`. Xem [NO_PRINT_DEMO.md](NO_PRINT_DEMO.md)
+để dùng video marker render qua ArUco/PnP thật, chạy lặp và có nhãn mô phỏng.
+
 Phạm vi: `calibrate.py`, `perception.py`, `test_perception.py`, hai ảnh mẫu in.
 Giao diện `contract.py` giữ nguyên. Không cần đợi filter hoặc main để thử P1.
 

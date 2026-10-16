@@ -83,6 +83,15 @@ class AlignmentKF:
         self.last_t_capture: float | None = None
         self.last_valid_obs_t: float | None = None
         self.last_mahalanobis_sq: float = 0.0
+        self._rejected_measurements = []
+        self.guidance_gen.reset()
+
+    def _initialize_pose(self, obs, R):
+        self.x = np.array([obs.x_cm, obs.z_cm, obs.yaw_deg, 0., 0., 0.], dtype=np.float64)
+        self.P = np.diag([R[0, 0], R[1, 1], R[2, 2], 25., 25., 100.])
+        self.initialized = True
+        self.last_valid_obs_t = float(obs.t_capture)
+        self._rejected_measurements = []
         self.guidance_gen.reset()
 
     def _build_F_and_Q(self, dt: float) -> tuple[np.ndarray, np.ndarray]:
@@ -161,6 +170,8 @@ class AlignmentKF:
             dt = 1.0 / 30.0
         else:
             dt = t_cap - self.last_t_capture
+            if dt <= 0 or dt > self.lost_timeout_s:
+                self._rejected_measurements = []
             if dt <= 0.0 or dt > 1.0:
                 dt = 1.0 / 30.0
         self.last_t_capture = t_cap
@@ -169,6 +180,7 @@ class AlignmentKF:
         # Chế độ TẮT FILTER (filter_enabled == False): trả thẳng giá trị raw
         # =====================================================================
         if not self.filter_enabled:
+            self._rejected_measurements = []
             if obs.found:
                 R_raw = self._compute_R(obs)
                 sx = float(math.sqrt(R_raw[0, 0]))
@@ -220,14 +232,7 @@ class AlignmentKF:
         if not self.initialized:
             if obs.found:
                 R0 = self._compute_R(obs)
-                self.x = np.array(
-                    [obs.x_cm, obs.z_cm, obs.yaw_deg, 0.0, 0.0, 0.0], dtype=np.float64
-                )
-                self.P = np.diag(
-                    [R0[0, 0], R0[1, 1], R0[2, 2], 25.0, 25.0, 100.0]
-                ).astype(np.float64)
-                self.initialized = True
-                self.last_valid_obs_t = t_cap
+                self._initialize_pose(obs, R0)
                 sx, sz, syaw = self._extract_sigmas()
                 status = (
                     "DEGRADED"
@@ -268,6 +273,7 @@ class AlignmentKF:
         # Giảm nhẹ vận tốc khi không thấy marker (damping tránh trôi xa khi che khuất)
         if not obs.found:
             self.x[3:6] *= 0.80
+            self._rejected_measurements = []
 
         rejected_by_gate = False
         high_reproj = False
@@ -304,10 +310,24 @@ class AlignmentKF:
                 I_KH = np.eye(6, dtype=np.float64) - (K @ self.H)
                 self.P = I_KH @ self.P @ I_KH.T + K @ R @ K.T
                 self.last_valid_obs_t = t_cap
+                self._rejected_measurements = []
             else:
                 rejected_by_gate = True
                 # Nếu bị gate liên tiếp (ví dụ vật thể vừa đổi vận tốc đột ngột), giảm vận tốc dự đoán
                 self.x[3:6] *= 0.50
+                # Five CONSECUTIVE good-quality, mutually consistent rejected
+                # observations indicate a stale motion model, not a lone outlier.
+                # Missing/ambiguous/high-error observations break the streak.
+                if not obs.ambiguous and not high_reproj:
+                    self._rejected_measurements = (self._rejected_measurements + [z_meas])[-5:]
+                    if len(self._rejected_measurements) == 5:
+                        offsets = np.asarray(self._rejected_measurements) - z_meas
+                        offsets[:, 2] = (offsets[:, 2] + 180) % 360 - 180
+                        if np.all(np.ptp(offsets, axis=0) < 3 * np.sqrt(np.diag(R))):
+                            self._initialize_pose(obs, R)
+                            rejected_by_gate = False
+                else:
+                    self._rejected_measurements = []
 
         # 4. Xác định trạng thái sức khỏe hệ thống (GOOD / DEGRADED / LOST)
         sx, sz, syaw = self._extract_sigmas()
