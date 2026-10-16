@@ -503,7 +503,9 @@ def run(args):
                             repeat_source = capture.source
                             capture.close()
                             capture = Capture(repeat_source)
-                            estimator, stub = load_filter()
+                            reset = getattr(estimator, 'reset', None)
+                            if reset is not None:
+                                reset()  # Preserve the presenter's F / RAW choice.
                             last_packet_at = time.perf_counter()
                             latencies.clear()
                             completions.clear()

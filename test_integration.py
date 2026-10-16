@@ -10,6 +10,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 import cv2
 import numpy as np
@@ -100,9 +101,23 @@ class IntegrationTests(unittest.TestCase):
         self.assertEqual(app.run(fallback_args), 5)
         loop_args = app.build_parser().parse_args([
             '--source', str(source), '--calib', str(calibration),
-            '--loop', '--headless', '--max-frames', '55',
+            '--loop', '--headless', '--max-frames', '55', '--record',
+            '--video-out', str(self.root / 'loop_raw.mp4'),
+            '--log-out', str(self.root / 'loop_raw.csv'),
         ])
-        self.assertEqual(app.run(loop_args), 55)
+        instances = []
+
+        def load_raw_initially():
+            estimator = AlignmentKF(filter_enabled=bool(instances))
+            instances.append(estimator)
+            return estimator, False
+
+        with patch.object(app, 'load_filter', side_effect=load_raw_initially):
+            self.assertEqual(app.run(loop_args), 55)
+        with (self.root / 'loop_raw.csv').open(newline='', encoding='utf-8') as handle:
+            loop_rows = list(csv.DictReader(handle))
+        self.assertTrue(all(row['filter_enabled'] == '0' for row in loop_rows),
+                        'Looping must preserve the presenter\'s F / RAW selection.')
 
     def test_p4_collection_and_evaluation(self):
         path = self.root / 'gt_runs_synthetic.csv'
