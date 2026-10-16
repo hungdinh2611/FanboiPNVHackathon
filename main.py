@@ -59,11 +59,12 @@ class Capture:
     A driver stuck in read cannot stall the UI or prevent fallback (daemon thread).
     """
 
-    def __init__(self, source, synthetic=False):
+    def __init__(self, source, synthetic=False, backend='auto'):
         self.source = source
         self.synthetic = synthetic
         self.live = isinstance(source, int) and not synthetic
         self.kind = 'SYNTHETIC' if synthetic else ('LIVE' if self.live else 'VIDEO')
+        self.backend = backend
         self.condition = threading.Condition()
         self.stop = threading.Event()
         self.ready = threading.Event()
@@ -78,7 +79,11 @@ class Capture:
         cap = None
         try:
             if not self.synthetic:
-                cap = cv2.VideoCapture(self.source)
+                if self.live and self.backend != 'auto':
+                    api = {'dshow': cv2.CAP_DSHOW, 'msmf': cv2.CAP_MSMF}[self.backend]
+                    cap = cv2.VideoCapture(self.source, api)
+                else:
+                    cap = cv2.VideoCapture(self.source)
                 if not cap.isOpened():
                     raise OSError(f'Cannot open source: {self.source}')
                 if self.live:
@@ -431,6 +436,10 @@ def render(packet, obs, state, perceiver, fps, latency, kind, enabled, stub, rec
 def build_parser():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('--source', default='0', help='Camera index or video path')
+    parser.add_argument('--camera-backend', choices=('auto', 'dshow', 'msmf'), default='auto',
+                        help='Camera API; dshow/msmf are Windows options, ignored for video files')
+    parser.add_argument('--camera-startup-timeout', type=float, default=10.,
+                        help='Seconds allowed for the first webcam frame (default: 10)')
     parser.add_argument('--calib', default='calib.npz')
     parser.add_argument('--marker-id', type=int, default=7)
     parser.add_argument('--marker-side-cm', type=float, default=6.0)
@@ -449,6 +458,8 @@ def build_parser():
 
 def run(args):
     source = int(args.source) if args.source.isdigit() else args.source
+    if not math.isfinite(args.camera_startup_timeout) or args.camera_startup_timeout <= 0:
+        raise ValueError('--camera-startup-timeout must be positive and finite')
     if args.replay and (isinstance(source, int) or args.synthetic):
         raise ValueError('--replay requires --source video.mp4, without --synthetic')
     if args.loop and (args.replay or args.synthetic or isinstance(source, int)):
@@ -468,7 +479,7 @@ def run(args):
                                     'or use --synthetic for a labelled UI demo.')
         perceiver = Perceiver(args.calib, marker_id=args.marker_id,
                               marker_side_cm=args.marker_side_cm)
-    capture = Capture(source, args.synthetic)
+    capture = Capture(source, args.synthetic, backend=args.camera_backend)
     recorder = None
     canvas = None
     want_record = args.record
@@ -491,7 +502,14 @@ def run(args):
         while True:
             packet = None if frozen else capture.read()
             if packet is None and not frozen:
-                if capture.done or time.perf_counter() - last_packet_at > 3:
+                # Windows camera initialization can exceed 3s. Once streaming,
+                # retain the shorter stall deadline so disconnection stays responsive.
+                timeout = args.camera_startup_timeout if capture.live and count == 0 else 3.
+                if capture.live and canvas is None:
+                    canvas = np.full((HEIGHT, WIDTH, 3), (22, 26, 34), np.uint8)
+                    put(canvas, 'DANG MO WEBCAM...', (30, 60), 1., COLORS['DEGRADED'], 2)
+                    put(canvas, f'CHO FRAME DAU TOI DA {timeout:g} GIAY | Q: THOAT', (30, 105), .7)
+                if capture.done or time.perf_counter() - last_packet_at > timeout:
                     if capture.live:
                         capture.close()
                         # Finalize MP4 before it can be used as a backup. Never append
@@ -511,7 +529,9 @@ def run(args):
                             latencies.clear()
                             completions.clear()
                             continue
-                        raise OSError((capture.error or 'Webcam timed out') + '; no backup video available')
+                        raise OSError((capture.error or 'Webcam timed out') +
+                                      '; no backup video available. Close other camera apps or '
+                                      'try --camera-backend dshow on Windows.')
                     if capture.error:
                         raise OSError(capture.error)
                     if capture.done:

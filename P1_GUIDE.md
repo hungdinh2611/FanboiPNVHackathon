@@ -42,6 +42,18 @@ Webcam 0 mở được, trả ảnh 1280×720. Driver **không hỗ trợ yêu c
 qua OpenCV trên lần thử này; cần giữ khoảng lấy nét ổn định hoặc tắt trong phần mềm camera.
 Chưa có đo thật bằng thước; kết quả self-test chỉ là dữ liệu tổng hợp.
 
+Nếu camera khởi động chậm: app chờ frame đầu tối đa 10 s, hiện `DANG MO WEBCAM`.
+Sau khi đã chạy, không có frame mới quá 3 s vẫn báo lỗi/chuyển video dự phòng.
+Trên Windows có thể chọn cách mở khác:
+
+```powershell
+python run_demo.py --record --camera-backend dshow
+```
+
+Mặc định giữ `--camera-backend auto`; `dshow`/`msmf` chỉ áp dụng webcam, không đổi
+cách đọc file video. Có thể chỉnh thời gian khởi động bằng
+`--camera-startup-timeout 15`. Thoát bằng Q để đóng phiên ghi và nhả camera.
+
 ```powershell
 python test_perception.py --self-test
 python calibrate.py --generate-patterns

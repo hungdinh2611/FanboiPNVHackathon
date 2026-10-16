@@ -40,6 +40,7 @@ def main():
             print('Use --check alone. For demo options: python run_demo.py --help', file=sys.stderr)
             return 2
         for command in [('test_perception.py', '--self-test'), ('test_filter.py',), ('test_recovery.py',),
+                        ('test_camera.py',),
                         ('test_integration.py',)]:
             result = subprocess.run([sys.executable, *command], cwd=ROOT)
             if result.returncode:
