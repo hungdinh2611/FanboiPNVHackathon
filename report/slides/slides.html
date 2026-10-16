@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Charge-Port Alignment Assist</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800&display=swap">
+<style>
+body{margin:0;background:#2b2f36;font-family:'Be Vietnam Pro',Arial,sans-serif}
+.frame{width:min(96vw,1280px);aspect-ratio:16/9;margin:24px auto 8px;position:relative;overflow:hidden;box-shadow:0 4px 18px rgba(0,0,0,.4)}
+.scaler{width:1920px;height:1080px;transform-origin:0 0;position:absolute;left:0;top:0}
+section{width:1920px;height:1080px;box-sizing:border-box;position:relative}
+section *{margin:0}
+table{border-collapse:collapse} th,td{border-bottom:1px solid #c9ced6;padding:.35em .6em;text-align:left}
+.notes{display:none}
+.frame + .n{width:min(96vw,1280px);margin:0 auto 24px;color:#cfd6df;font-size:15px}
+</style></head><body>
+<div class="frame"><div class="scaler"><section id="cover" data-transition="fade" style="background:#13233A;color:#F5F6F2;font-family:'Be Vietnam Pro', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;justify-content:space-between;gap:48px">
+<p style="font-size:30px;font-weight:600;color:#F2A65A;letter-spacing:4px;text-transform:uppercase">Vin Perception Hackathon · AI20k Track 4</p>
+<div style="display:flex;flex-direction:column;gap:32px">
+<h1 style="font-size:112px;font-weight:800;line-height:1.05;color:#F5F6F2">Charge-Port<br>Alignment Assist</h1>
+<p style="font-size:40px;line-height:1.35;color:#C9D3E0;max-width:1300px">Đầu sạc biết cổng sạc ở đâu, lệch bao nhiêu cm, và biết khi nào mình không chắc.</p>
+</div>
+<div style="display:flex;gap:48px">
+<p style="font-size:24px;color:#C9D3E0"><b>P1</b> Đinh Bảo Hưng</p>
+<p style="font-size:24px;color:#C9D3E0"><b>P2</b> Ngô Thế Việt</p>
+<p style="font-size:24px;color:#C9D3E0"><b>P3</b> Nguyễn Khánh Đô</p>
+<p style="font-size:24px;color:#C9D3E0"><b>P4</b> Nguyễn Quang Đạo</p>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#8FA0B6">Cho V-GREEN, VinFast, Xanh SM · Demo dùng thẻ ArUco, dữ liệu do thành viên tự đóng vai</p>
+<div class="notes">Ghi chú: P4 mở đầu (0:00–1:00). Một câu: đầu sạc biết cổng sạc ở đâu và biết khi nào mình không chắc. Giới thiệu nhanh bốn vai.</div>
+</section>
+</div></div><div class="n"></div><div class="frame"><div class="scaler"><section id="problem" data-transition="fade" style="background:#F5F6F2;color:#13233A;font-family:'Be Vietnam Pro', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+<h2 style="font-size:64px;font-weight:700;line-height:1.1">Người dùng và nỗi đau</h2>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:32px">
+<div style="display:flex;flex-direction:column;gap:16px;background:#FFFFFD;padding:40px;border:1px solid #D8DDE3;border-radius:16px">
+<div style="color:#2F6FDB;width:56px;height:56px;font-size:48px;line-height:1">&#128101;</div>
+<h3 style="font-size:40px;font-weight:700">Tài xế Xanh SM</h3>
+<p style="font-size:30px;line-height:1.4;color:#4A5568">Căn và cắm đầu sạc mất thời gian, nhất là khi đỗ lệch hoặc trời tối. Mỗi phút chờ là mất doanh thu.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px;background:#FFFFFD;padding:40px;border:1px solid #D8DDE3;border-radius:16px">
+<div style="color:#2F6FDB;width:56px;height:56px;font-size:48px;line-height:1">&#128295;</div>
+<h3 style="font-size:40px;font-weight:700">Kỹ thuật viên V-GREEN</h3>
+<p style="font-size:30px;line-height:1.4;color:#4A5568">Cắm lệch làm mòn chân sạc. Cần biết cổng sạc lệch bao nhiêu trước khi cắm.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px;background:#FFFFFD;padding:40px;border:1px solid #D8DDE3;border-radius:16px">
+<div style="color:#2F6FDB;width:56px;height:56px;font-size:48px;line-height:1">&#9881;</div>
+<h3 style="font-size:40px;font-weight:700">Robot sạc tự động</h3>
+<p style="font-size:30px;line-height:1.4;color:#4A5568">Muốn tự cắm thì phải biết cổng sạc ở đâu (x, z, yaw) và chắc đến mức nào (sigma).</p>
+</div>
+</div>
+<p style="font-size:30px;line-height:1.4;color:#13233A"><b>Hệ thống trả về:</b> lệch ngang, khoảng cách, góc lệch, độ bất định, và chỉ dẫn như <b>“SANG PHAI 3 cm | TIEN 12 cm”</b>.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#4A5568">2</p>
+<div class="notes">Ghi chú: P4, khoảng 1 phút. Nêu ba nhóm người dùng, nhấn mạnh robot sạc là hướng dài hạn: cần pose cộng độ tin cậy.</div>
+</section>
+</div></div><div class="n"></div><div class="frame"><div class="scaler"><section id="demo" data-transition="fade" style="background:#13233A;color:#F5F6F2;font-family:'Be Vietnam Pro', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+<h2 style="font-size:64px;font-weight:700;line-height:1.1;color:#F5F6F2">Demo trực tiếp · 4 phút</h2>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:32px">
+<div style="display:flex;gap:28px;align-items:start;background:#1D3150;padding:36px;border-radius:16px">
+<p style="font-size:64px;font-weight:800;color:#F2A65A;line-height:1">1</p>
+<p style="font-size:30px;line-height:1.4;color:#C9D3E0">Đưa thẻ lại gần: chỉ dẫn đổi theo. Ra xa: elip bất định to dần.</p>
+</div>
+<div style="display:flex;gap:28px;align-items:start;background:#1D3150;padding:36px;border-radius:16px">
+<p style="font-size:64px;font-weight:800;color:#F2A65A;line-height:1">2</p>
+<p style="font-size:30px;line-height:1.4;color:#C9D3E0">Bấm F: so raw và Kalman, thấy rõ filter giảm rung.</p>
+</div>
+<div style="display:flex;gap:28px;align-items:start;background:#1D3150;padding:36px;border-radius:16px">
+<p style="font-size:64px;font-weight:800;color:#F2A65A;line-height:1">3</p>
+<p style="font-size:30px;line-height:1.4;color:#C9D3E0">Mời giám khảo cầm thẻ. Thẻ có id khác: hệ thống bỏ qua.</p>
+</div>
+<div style="display:flex;gap:28px;align-items:start;background:#1D3150;padding:36px;border-radius:16px">
+<p style="font-size:64px;font-weight:800;color:#F2A65A;line-height:1">4</p>
+<p style="font-size:30px;line-height:1.4;color:#C9D3E0">Cố tình che góc hoặc ra xa và nghiêng: hệ thống chuyển DEGRADED/LOST và không đoán bừa.</p>
+</div>
+</div>
+<p style="font-size:28px;color:#8FA0B6">Hỏng giữa chừng: chuyển sang video dự phòng, màn hình hiện “VIDEO DA GHI - KHONG PHAI LIVE”.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#8FA0B6">3 · Lệnh chạy: python run_demo.py</p>
+<div class="notes">Ghi chú: P3 cầm máy, P1 cầm thẻ. Bước 4 là ca lỗi ăn điểm Bằng chứng: P1 giải thích vì sao. Nếu webcam hỏng, nói rõ đang chiếu video.</div>
+</section>
+</div></div><div class="n"></div><div class="frame"><div class="scaler"><section id="architecture" data-transition="fade" style="background:#F5F6F2;color:#13233A;font-family:'Be Vietnam Pro', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<h2 style="font-size:64px;font-weight:700;line-height:1.1">Kiến trúc và trụ cột Track 4</h2>
+<div style="display:flex;align-items:center;gap:16px">
+<p style="font-size:28px;font-weight:600;background:#FFFFFD;border:2px solid #13233A;border-radius:12px;padding:20px 24px;white-space:nowrap">Webcam</p>
+<div style="font-size:48px;color:#2F6FDB">&#8594;</div>
+<p style="font-size:28px;font-weight:600;background:#FFFFFD;border:2px solid #13233A;border-radius:12px;padding:20px 24px;white-space:nowrap">Frame mới nhất</p>
+<div style="font-size:48px;color:#2F6FDB">&#8594;</div>
+<p style="font-size:28px;font-weight:600;background:#FFFFFD;border:2px solid #13233A;border-radius:12px;padding:20px 24px;white-space:nowrap">ArUco + PnP</p>
+<div style="font-size:48px;color:#2F6FDB">&#8594;</div>
+<p style="font-size:28px;font-weight:600;background:#FFFFFD;border:2px solid #13233A;border-radius:12px;padding:20px 24px;white-space:nowrap">Kalman</p>
+<div style="font-size:48px;color:#2F6FDB">&#8594;</div>
+<p style="font-size:28px;font-weight:600;background:#FFFFFD;border:2px solid #13233A;border-radius:12px;padding:20px 24px;white-space:nowrap">Chỉ dẫn + HUD</p>
+</div>
+<table style="font-size:28px;color:#13233A">
+<tr><th style="width:22%">Trụ cột</th><th style="width:78%">Nằm ở đâu</th></tr>
+<tr><td>Hình học</td><td>Hiệu chuẩn camera, solvePnP (IPPE), đổi sang hệ tọa độ đầu sạc</td></tr>
+<tr><td>Bất định</td><td>Kalman, nhiễu đo tăng theo z², gating Mahalanobis, elip ±2 sigma</td></tr>
+<tr><td>Thời gian</td><td>Chỉ giữ frame mới nhất, timestamp từng tầng, latency p50/p95</td></tr>
+<tr><td>Bằng chứng</td><td>Ground truth bằng thước trên lưới 12 tư thế, ca lỗi có chủ đích</td></tr>
+</table>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#4A5568">4</p>
+<div class="notes">Ghi chú: P2, 30 giây. Mỗi trụ cột chỉ vào đúng một khâu trong luồng. Nhấn mạnh: hiển thị độ bất định chứ không chỉ một con số.</div>
+</section>
+</div></div><div class="n"></div><div class="frame"><div class="scaler"><section id="results" data-transition="fade" style="background:#F5F6F2;color:#13233A;font-family:'Be Vietnam Pro', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<h2 style="font-size:64px;font-weight:700;line-height:1.1">Số đo so với thước (12 tư thế, 30 frame mỗi tư thế)</h2>
+<div style="display:flex;gap:48px;align-items:start">
+<table style="font-size:28px;color:#13233A;width:1000px">
+<tr><th style="width:28%">Khoảng cách</th><th style="width:24%">MAE z raw</th><th style="width:24%">MAE z Kalman</th><th style="width:24%">p95 z</th></tr>
+<tr><td>30 cm</td><td>[__] cm</td><td>[__] cm</td><td>[__] cm</td></tr>
+<tr><td>60 cm</td><td>[__] cm</td><td>[__] cm</td><td>[__] cm</td></tr>
+<tr><td>100 cm</td><td>[__] cm</td><td>[__] cm</td><td>[__] cm</td></tr>
+</table>
+<div style="flex:1;display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:column;gap:4px;background:#FFFFFD;border:1px solid #D8DDE3;border-radius:16px;padding:28px">
+<p style="font-size:56px;font-weight:800;color:#2F6FDB">[__]%</p>
+<p style="font-size:24px;color:#4A5568">Kalman giảm rung khi đứng yên</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:4px;background:#FFFFFD;border:1px solid #D8DDE3;border-radius:16px;padding:28px">
+<p style="font-size:56px;font-weight:800;color:#2F6FDB">[__]%</p>
+<p style="font-size:24px;color:#4A5568">lỗi thực nằm trong ±2 sigma (kỳ vọng 95%)</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:4px;background:#FFFFFD;border:1px solid #D8DDE3;border-radius:16px;padding:28px">
+<p style="font-size:56px;font-weight:800;color:#2F6FDB">[__] ms</p>
+<p style="font-size:24px;color:#4A5568">độ trễ p50 từ lúc chụp tới HUD</p>
+</div>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#4A5568">5 · Nguồn: report/metrics.md · Sai số của chính thước khoảng ±2 mm, ±2 độ</p>
+<div class="notes">Ghi chú: P4. Điền số từ report/metrics.md sau khi chạy evaluate.py trên data/gt_runs.csv. KHÔNG dùng số từ metrics_synthetic.md hay từ video render. Nói rõ: lỗi nhỏ hơn sai số thước thì không khẳng định được.</div>
+</section>
+</div></div><div class="n"></div><div class="frame"><div class="scaler"><section id="failures" data-transition="fade" style="background:#F5F6F2;color:#13233A;font-family:'Be Vietnam Pro', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<h2 style="font-size:64px;font-weight:700;line-height:1.1">Ca lỗi và vì sao</h2>
+<table style="font-size:26px;color:#13233A">
+<tr><th style="width:20%">Ca</th><th style="width:30%">Hiện tượng</th><th style="width:28%">Nguyên nhân</th><th style="width:22%">Hệ thống phản ứng</th></tr>
+<tr><td>Xa và nghiêng vừa</td><td>Yaw nhảy giữa +19 và −19 độ dù thẻ đứng yên</td><td>Marker nhỏ, hai nghiệm PnP gần như bằng nhau</td><td>ambiguous, DEGRADED</td></tr>
+<tr><td>Che một góc</td><td>Mất marker hoàn toàn</td><td>Detector cần đủ 4 cạnh khung đen</td><td>LOST sau 0.5 s, không chỉ dẫn</td></tr>
+<tr><td>Lóa phản chiếu</td><td>[__]</td><td>[__]</td><td>[__]</td></tr>
+</table>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Hai dòng đầu đã thấy trên video render khi kiểm thử; cần xác nhận lại bằng thẻ in thật trước khi trình bày.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#4A5568">6 · Nguồn: report/failure_cases.md</p>
+<div class="notes">Ghi chú: P4 (P1 bổ sung nếu bị hỏi về PnP). Chỉ nói phản ứng đã quan sát thật. Nếu ca thật khác ca render, sửa bảng theo ca thật. Khi demo bước 4, chỉ vào đúng dòng này.</div>
+</section>
+</div></div><div class="n"></div><div class="frame"><div class="scaler"><section id="limits" data-transition="fade" style="background:#F5F6F2;color:#13233A;font-family:'Be Vietnam Pro', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<h2 style="font-size:64px;font-weight:700;line-height:1.1">Giới hạn đã chứng minh</h2>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:32px">
+<div style="display:flex;flex-direction:column;gap:12px;background:#FFFFFD;border:1px solid #D8DDE3;border-radius:16px;padding:40px">
+<h3 style="font-size:40px;font-weight:700">Dùng marker</h3>
+<p style="font-size:30px;line-height:1.4;color:#4A5568">Cổng sạc thật không có thẻ ArUco. Bước tiếp theo bắt buộc là detector học được.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;background:#FFFFFD;border:1px solid #D8DDE3;border-radius:16px;padding:40px">
+<h3 style="font-size:40px;font-weight:700">Vùng đã đo</h3>
+<p style="font-size:30px;line-height:1.4;color:#4A5568">z 30–100 cm, yaw 0–40 độ, một camera, một phòng, một điều kiện ánh sáng.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;background:#FFFFFD;border:1px solid #D8DDE3;border-radius:16px;padding:40px">
+<h3 style="font-size:40px;font-weight:700">Sai số ground truth</h3>
+<p style="font-size:30px;line-height:1.4;color:#4A5568">Thước khoảng ±2 mm, thước góc khoảng ±2 độ, cộng vị trí tâm ống kính ước lượng.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;background:#FFFFFD;border:1px solid #D8DDE3;border-radius:16px;padding:40px">
+<h3 style="font-size:40px;font-weight:700">Sigma không thấy bias</h3>
+<p style="font-size:30px;line-height:1.4;color:#4A5568">Hiệu chuẩn lệch hoặc in sai cỡ marker gây sai số hệ thống mà Kalman không biết.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#4A5568">7</p>
+<div class="notes">Ghi chú: P4. Nói thẳng, không né. Nếu dùng K ước lượng (HFOV 68 độ) thay vì hiệu chuẩn thật, thêm điều đó vào đây.</div>
+</section>
+</div></div><div class="n"></div><div class="frame"><div class="scaler"><section id="impact" data-transition="fade" style="background:#F2A65A;color:#13233A;font-family:'Be Vietnam Pro', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<h2 style="font-size:64px;font-weight:700;line-height:1.1">Impact: cách tính, không phải cam kết</h2>
+<p style="font-size:40px;font-weight:600;line-height:1.35">Số xe × lần sạc mỗi ngày × phút tiết kiệm mỗi lần × giá trị một phút</p>
+<table style="font-size:28px;color:#13233A">
+<tr><th style="width:20%">Kịch bản</th><th style="width:16%">Số xe</th><th style="width:16%">Lần sạc/ngày</th><th style="width:16%">Phút/lần</th><th style="width:16%">VND/phút</th><th style="width:16%">Tỷ VND/năm</th></tr>
+<tr><td>Thấp</td><td>2,000</td><td>1.0</td><td>0.25</td><td>1,000</td><td>0.18</td></tr>
+<tr><td>Cơ sở</td><td>10,000</td><td>1.5</td><td>0.5</td><td>1,500</td><td>4.1</td></tr>
+<tr><td>Cao</td><td>30,000</td><td>2.0</td><td>1.0</td><td>2,500</td><td>55</td></tr>
+</table>
+<p style="font-size:28px;line-height:1.4">Mọi tham số là <b>giả định của nhóm</b>, không phải số liệu Vin. Thấp và cao chênh khoảng 300 lần; tham số nhạy nhất là số phút tiết kiệm mỗi lần sạc, cần đo tại trạm thật.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#13233A">8 · Nguồn: impact.md</p>
+<div class="notes">Ghi chú: P4, khoảng 30 giây. Nói công thức trước, rồi kịch bản cơ sở, rồi ngay lập tức nói đây là giả định. Ngoài tiền: an toàn khi cắm sạc và nền móng cho robot sạc.</div>
+</section>
+</div></div><div class="n"></div><div class="frame"><div class="scaler"><section id="roadmap" data-transition="fade" style="background:#F5F6F2;color:#13233A;font-family:'Be Vietnam Pro', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+<h2 style="font-size:64px;font-weight:700;line-height:1.1">Lộ trình mở rộng và rủi ro</h2>
+<div style="display:flex;gap:24px;align-items:stretch">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#13233A;border-radius:16px;padding:32px">
+<p style="font-size:24px;font-weight:700;color:#F2A65A">BÂY GIỜ</p>
+<p style="font-size:30px;line-height:1.35;color:#F5F6F2">Thẻ ArUco, một webcam, kiểm bằng thước</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FFFFFD;border:1px solid #D8DDE3;border-radius:16px;padding:32px">
+<p style="font-size:24px;font-weight:700;color:#2F6FDB">BƯỚC 2</p>
+<p style="font-size:30px;line-height:1.35;color:#13233A">Detector học được cho cổng sạc thật của xe VinFast</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FFFFFD;border:1px solid #D8DDE3;border-radius:16px;padding:32px">
+<p style="font-size:24px;font-weight:700;color:#2F6FDB">BƯỚC 3</p>
+<p style="font-size:30px;line-height:1.35;color:#13233A">Stereo hoặc cảm biến độ sâu</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FFFFFD;border:1px solid #D8DDE3;border-radius:16px;padding:32px">
+<p style="font-size:24px;font-weight:700;color:#2F6FDB">BƯỚC 4</p>
+<p style="font-size:30px;line-height:1.35;color:#13233A">Cánh tay robot tại trạm V-GREEN</p>
+</div>
+</div>
+<p style="font-size:30px;line-height:1.4;color:#4A5568"><b style="color:#13233A">Rủi ro:</b> che khuất, lóa và trời tối, hiệu chuẩn lệch, an toàn điện khi robot cắm. Robot chỉ được cắm khi status GOOD và sigma nhỏ; con người xác nhận cuối.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#4A5568">9</p>
+<div class="notes">Ghi chú: P4, khoảng 20 giây. Bước 2 là câu trả lời cho câu hỏi “cổng sạc thật đâu có marker”.</div>
+</section>
+</div></div><div class="n"></div><div class="frame"><div class="scaler"><section id="qa" data-transition="fade" style="background:#13233A;color:#F5F6F2;font-family:'Be Vietnam Pro', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;justify-content:space-between;gap:48px">
+<h2 style="font-size:96px;font-weight:800;line-height:1.1;color:#F5F6F2">Hỏi đáp</h2>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:32px">
+<p style="font-size:30px;line-height:1.4;color:#C9D3E0"><b style="color:#F2A65A">P1 Hình học:</b> hiệu chuẩn, PnP, vì sao có mơ hồ</p>
+<p style="font-size:30px;line-height:1.4;color:#C9D3E0"><b style="color:#F2A65A">P2 Bất định:</b> Q, R, sigma có đáng tin không</p>
+<p style="font-size:30px;line-height:1.4;color:#C9D3E0"><b style="color:#F2A65A">P3 Hệ thống:</b> frame mới nhất, độ trễ, HUD</p>
+<p style="font-size:30px;line-height:1.4;color:#C9D3E0"><b style="color:#F2A65A">P4 Bằng chứng:</b> cách đo, giới hạn, impact</p>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#8FA0B6">10 · Câu trả lời mẫu: Q&amp;A.md</p>
+<div class="notes">Ghi chú: 3 phút. Mỗi người trả lời phần mình theo Q&amp;A.md. Không biết thì nói không biết và nói sẽ đo thế nào.</div>
+</section>
+</div></div><div class="n"></div>
+<script>
+function fit(){document.querySelectorAll('.frame').forEach(f=>{f.firstChild.style.transform='scale('+f.clientWidth/1920+')';});}
+document.querySelectorAll('.frame').forEach(f=>{const n=f.querySelector('.notes');if(n)f.nextElementSibling.textContent=n.textContent;});
+addEventListener('resize',fit);fit();
+</script></body></html>
