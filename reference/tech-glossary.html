@@ -1,0 +1,23 @@
+<!doctype html><html lang="vi"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Từ điển kỹ thuật — Charge-Port</title><link rel="stylesheet" href="../assets/teaching.css"><body><div class="eyebrow">CHARGE-PORT / TỜ TRA NHANH</div><h1>Tên gọi và ý nghĩa</h1><p><a href="../lessons/0001-hackathon-tech.html">← Bài ôn và tự kiểm tra</a></p><table><thead><tr><th>Từ</th><th>Nghĩa trong bài</th><th>Tránh hiểu nhầm</th></tr></thead><tbody>
+<tr><td>Computer vision</td><td>Máy tính suy ra thông tin từ ảnh.</td><td>Không nhất thiết phải có mạng neural.</td></tr>
+<tr><td>Checkerboard</td><td>Mẫu bàn cờ để tìm thông số camera từ nhiều tư thế.</td><td>Không phải marker theo dõi cổng sạc.</td></tr>
+<tr><td>Calibration / K</td><td>Hiệu chuẩn / ma trận tiêu cự pixel và tâm ảnh.</td><td>K của webcam không phải K của điện thoại đang hiển thị mẫu.</td></tr>
+<tr><td>dist</td><td>Hệ số mô tả méo ống kính.</td><td>Không phải distance/khoảng cách.</td></tr>
+<tr><td>RMS calibration</td><td>Căn trung bình bình phương sai số góc bàn cờ, đơn vị pixel.</td><td>Không phải sai số cm, không phải phần trăm accuracy.</td></tr>
+<tr><td>ArUco</td><td>Marker vuông có mã ID; code lấy ID và bốn góc.</td><td>Không phải QR chứa URL, không phải detector học cổng sạc.</td></tr>
+<tr><td>DICT_5X5_50</td><td>Dictionary 50 mã; mỗi mã dùng lưới mã 5×5 bên trong.</td><td>Không có nghĩa cạnh 5 cm hoặc ảnh 50 pixel.</td></tr>
+<tr><td>PnP</td><td>Tìm tư thế từ điểm 3D đã biết và vị trí pixel tương ứng.</td><td>Đầu vào đã cần góc marker; PnP không tự tìm marker.</td></tr>
+<tr><td>IPPE_SQUARE</td><td>Bộ giải dành cho marker vuông phẳng; có thể trả hai nghiệm.</td><td>Nghiêng nhiều không bảo đảm luôn ambiguous.</td></tr>
+<tr><td>rvec / tvec</td><td>Biểu diễn xoay / tịnh tiến marker sang hệ camera.</td><td>tvec có đơn vị theo kích thước marker nhập vào.</td></tr>
+<tr><td>x / z / yaw</td><td>Lệch ngang cm / khoảng cách theo trục camera cm / góc hướng mặt marker độ.</td><td>z không phải đường chéo từ camera tới marker.</td></tr>
+<tr><td>Reprojection error</td><td>Chiếu tư thế ước lượng về ảnh rồi so góc; P1 lấy trung bình khoảng cách bốn góc.</td><td>Nhỏ chưa đủ bảo đảm tư thế hoặc kích thước thực đúng.</td></tr>
+<tr><td>Kalman</td><td>Dự đoán theo chuyển động rồi sửa bằng phép đo mới.</td><td>Không sửa được mọi bias hiệu chuẩn; có thể tạo độ trễ.</td></tr>
+<tr><td>Q / R / P</td><td>Bất định mô hình chuyển động / phép đo / trạng thái ước lượng.</td><td>R của Kalman khác R ma trận xoay trong PnP.</td></tr>
+<tr><td>sigma</td><td>Độ lệch chuẩn do mô hình ước lượng.</td><td>Không phải biên sai số chắc chắn; cần kiểm chứng bằng GT.</td></tr>
+<tr><td>Mahalanobis gating</td><td>Kiểm tra phép đo lệch dự đoán bao xa so với độ bất định.</td><td>Ngưỡng chi-square 99% không phải accuracy 99%.</td></tr>
+<tr><td>Deadband / hysteresis</td><td>Vùng coi như đạt / ngưỡng vào và ra khác nhau.</td><td>Để giảm nhấp nháy chỉ dẫn, không làm phép đo chính xác hơn.</td></tr>
+<tr><td>FPS / latency</td><td>Số frame mỗi giây / độ trễ của một frame qua pipeline.</td><td>30 FPS không chứng minh latency thấp.</td></tr>
+<tr><td>p50 / p95</td><td>Trung vị / phân vị 95 của tập số đo.</td><td>p95=20 ms không có nghĩa accuracy 95%.</td></tr>
+<tr><td>GT / MAE / std</td><td>Mốc tham chiếu / lỗi tuyệt đối trung bình / độ rung quanh trung bình.</td><td>std thấp vẫn có thể sai lệch hệ thống lớn.</td></tr>
+<tr><td>Render</td><td>Ảnh tạo từ camera và vật thể ảo có hình học biết trước.</td><td>GT mô hình không phải phép đo bằng thước.</td></tr>
+</tbody></table><footer>Nguồn nền tảng: <a href="https://docs.opencv.org/4.x/dc/dbb/tutorial_py_calibration.html">Calibration</a> · <a href="https://docs.opencv.org/4.x/d5/dae/tutorial_aruco_detection.html">ArUco</a> · <a href="https://docs.opencv.org/4.x/d5/d1f/calib3d_solvePnP.html">PnP</a> · <a href="https://docs.opencv.org/4.x/dd/d6a/classcv_1_1KalmanFilter.html">Kalman</a>. Tham số riêng lấy từ code repo.</footer></body></html>
