@@ -1,27 +1,30 @@
-<section id="results" data-transition="fade" style="background:#F5F6F2;color:#13233A;font-family:'Be Vietnam Pro', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
-<h2 style="font-size:64px;font-weight:700;line-height:1.1">Số đo so với thước (12 tư thế, 30 frame mỗi tư thế)</h2>
+<section id="results" data-transition="fade" style="background:#F5F6F2;color:#13233A;font-family:'Be Vietnam Pro', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:700;color:#B5541B;letter-spacing:2px">MÔ PHỎNG · CAMERA ẢO · CHƯA ĐO BẰNG THƯỚC</p>
+<h2 style="font-size:64px;font-weight:700;line-height:1.1">Số đo trên 12 tư thế, 30 frame mỗi tư thế</h2>
+</div>
 <div style="display:flex;gap:48px;align-items:start">
 <table style="font-size:28px;color:#13233A;width:1000px">
-<tr><th style="width:28%">Khoảng cách</th><th style="width:24%">MAE z raw</th><th style="width:24%">MAE z Kalman</th><th style="width:24%">p95 z</th></tr>
-<tr><td>30 cm</td><td>[__] cm</td><td>[__] cm</td><td>[__] cm</td></tr>
-<tr><td>60 cm</td><td>[__] cm</td><td>[__] cm</td><td>[__] cm</td></tr>
-<tr><td>100 cm</td><td>[__] cm</td><td>[__] cm</td><td>[__] cm</td></tr>
+<tr><th style="width:28%">Khoảng cách</th><th style="width:24%">MAE z raw</th><th style="width:24%">MAE z Kalman</th><th style="width:24%">p95 z raw</th></tr>
+<tr><td>30 cm</td><td>0.04 cm</td><td>0.04 cm</td><td>0.06 cm</td></tr>
+<tr><td>60 cm</td><td>0.15 cm</td><td>0.15 cm</td><td>0.46 cm</td></tr>
+<tr><td>100 cm</td><td>0.41 cm</td><td>0.41 cm</td><td>0.65 cm</td></tr>
 </table>
 <div style="flex:1;display:flex;flex-direction:column;gap:24px">
 <div style="display:flex;flex-direction:column;gap:4px;background:#FFFFFD;border:1px solid #D8DDE3;border-radius:16px;padding:28px">
-<p style="font-size:56px;font-weight:800;color:#2F6FDB">[__]%</p>
-<p style="font-size:24px;color:#4A5568">Kalman giảm rung khi đứng yên</p>
+<p style="font-size:56px;font-weight:800;color:#2F6FDB">~85%</p>
+<p style="font-size:24px;color:#4A5568">Kalman giảm rung khi đứng yên (mô phỏng)</p>
 </div>
 <div style="display:flex;flex-direction:column;gap:4px;background:#FFFFFD;border:1px solid #D8DDE3;border-radius:16px;padding:28px">
-<p style="font-size:56px;font-weight:800;color:#2F6FDB">[__]%</p>
-<p style="font-size:24px;color:#4A5568">lỗi thực nằm trong ±2 sigma (kỳ vọng 95%)</p>
+<p style="font-size:56px;font-weight:800;color:#2F6FDB">11/12</p>
+<p style="font-size:24px;color:#4A5568">tư thế đạt GOOD ≥ 90% (mô phỏng)</p>
 </div>
 <div style="display:flex;flex-direction:column;gap:4px;background:#FFFFFD;border:1px solid #D8DDE3;border-radius:16px;padding:28px">
-<p style="font-size:56px;font-weight:800;color:#2F6FDB">[__] ms</p>
-<p style="font-size:24px;color:#4A5568">độ trễ p50 từ lúc chụp tới HUD</p>
+<p style="font-size:56px;font-weight:800;color:#2F6FDB">12.2 ms</p>
+<p style="font-size:24px;color:#4A5568">độ trễ p50 trên webcam thật (p95 15.5 ms)</p>
 </div>
 </div>
 </div>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#4A5568">5 · Nguồn: report/metrics.md · Sai số của chính thước khoảng ±2 mm, ±2 độ</p>
-<aside>P4. Điền số từ report/metrics.md sau khi chạy evaluate.py trên data/gt_runs.csv. KHÔNG dùng số từ metrics_synthetic.md hay từ video render. Nói rõ: lỗi nhỏ hơn sai số thước thì không khẳng định được.</aside>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#4A5568">5 · Nguồn: report/metrics_render.md · Lỗi tăng theo z đúng như lý thuyết; đây là giới hạn thuật toán khi ảnh gần lý tưởng</p>
+<aside>P4. Mở đầu bằng: số này là mô phỏng camera ảo, chưa đo bằng thước. Nó chứng minh pipeline đúng hình học và lỗi tăng theo khoảng cách như lý thuyết; webcam thật chắc chắn kém hơn. Độ trễ là số duy nhất đo trên phần cứng thật: 300 frame, chỉ phần mềm, từ lúc grab tới vẽ xong HUD.</aside>
 </section>

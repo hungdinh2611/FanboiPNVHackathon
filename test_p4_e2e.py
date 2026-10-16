@@ -49,6 +49,7 @@ def make_video(path, K, poses):
 
 
 def main():
+    # python test_p4_e2e.py [duong_dan_csv]: mac dinh ghi vao thu muc tam
     tmp = tempfile.mkdtemp(prefix="p4_e2e_")
     calib = os.path.join(tmp, "calib.npz")
     approximate_calibration(68, (1280, 720), calib)
@@ -73,7 +74,9 @@ def main():
     saved = (cv2.waitKey, cv2.imshow, cv2.destroyAllWindows, builtins.input)
     cv2.waitKey, cv2.imshow, cv2.destroyAllWindows = fake_wait, (lambda *a, **k: None), (lambda: None)
     builtins.input = lambda prompt="": answers.pop(0)
-    out = os.path.join(tmp, "gt_runs_render.csv")
+    out = sys.argv[1] if len(sys.argv) > 1 else os.path.join(tmp, "gt_runs_render.csv")
+    if os.path.exists(out):
+        os.remove(out)
     try:
         collect_gt.run_live(types.SimpleNamespace(calib=calib, source=video, width=1280, height=720,
                                                   marker_side_cm=6.0, out=out))

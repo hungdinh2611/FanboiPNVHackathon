@@ -1,8 +1,9 @@
 # Ca lỗi
 
-> Phần A lấy từ video marker **RENDER** (`python test_p4_e2e.py`, K ước lượng HFOV 68 độ, nhiễu Gaussian và blur nhẹ).
-> Phần này KHÔNG phải bằng chứng thật: nó cho biết nên tìm gì khi đo bằng thẻ in. Phần B điền sau khi thu bằng
-> `collect_gt.py` (nhấn K), số lấy từ bảng "Phan bo status va ca loi" trong `report/metrics.md`.
+> **Toàn bộ số trong file này là MÔ PHỎNG**: video marker render bằng camera ảo (K và ground truth đã biết),
+> ArUco/PnP/Kalman chạy thật trên từng frame. Nhóm không in thẻ nên **chưa có phép đo vật lý**; không suy các số này
+> thành độ chính xác của webcam thật. Nguồn: `report/metrics_render.md` (`test_p4_e2e.py`) và
+> `report/validation_render.md` (`verify_demo.py`).
 
 ## A. Phát hiện khi kiểm thử bằng video render
 
@@ -36,13 +37,21 @@
   tại phép đo (`report/proposals/p2_reinit_after_consistent_gating.patch`). Outlier lẻ vẫn bị loại, nghiệm lật
   qua lại không kích hoạt. Đo trên video render: 11/12 tư thế GOOD 100%; test P2 vẫn PASS.
 
-## B. Ca lỗi trên thẻ in thật (điền sau khi thu)
+## B. Ca lỗi có chủ đích trong video demo không in (mô phỏng)
 
-| Nhãn | Hiện tượng | Nguyên nhân kỹ thuật | Phản ứng (found / ambiguous / reproj / status) |
+Kịch bản 28 giây của `run_demo.py --no-print`, 840 frame, kiểm bằng `verify_demo.py`: 12/12 mục PASS.
+
+| Ca | Hiện tượng | Nguyên nhân kỹ thuật | Hệ thống phản ứng |
 | --- | --- | --- | --- |
-| fail_glare | `[điền]` | `[điền]` | `[điền]` |
-| fail_yaw70 | `[điền]` | `[điền]` | `[điền]` |
-| fail_occlude hoặc fail_blur | `[điền]` | `[điền]` | `[điền]` |
+| Lóa (glare) | Vùng trắng phủ lên mã, 60/60 frame không nhận | Mất tương phản đen/trắng của các ô mã, detector không giải được ID | `found` 0%, chuyển LOST, không chỉ dẫn |
+| Mờ chuyển động | 60/60 frame không nhận | Các ô mã bị trộn, cạnh khung đen không còn sắc | `found` 0%, LOST |
+| Che một góc | 60/60 frame không nhận | Detector cần đủ tứ giác khung đen | `found` 0%, LOST |
+| Thẻ ID 8 (sai ID) | Thấy marker nhưng bỏ qua | Chỉ nhận `marker_id=7` | `found` 0%, LOST, không bị đánh lừa |
+| Đổi chỗ nhanh | Kalman bám lại sau 4 frame | Khởi tạo lại sau chuỗi phép đo tốt và nhất quán | GOOD 95.6% trong đoạn |
+| Xa và nghiêng vừa (P08, z100 yaw20) | Yaw lật ±19 độ | Hai nghiệm IPPE gần bằng nhau khi marker nhỏ | ambiguous 60%, GOOD chỉ 23% (vẫn có frame sai mà GOOD: giới hạn) |
+
+Nhận xét trung thực: trong mô phỏng, lóa và mờ làm mất marker hoàn toàn; ngoài đời có thể chỉ làm tăng reproj error
+mà vẫn nhận (nguy hiểm hơn). Cần kiểm lại khi có thẻ thật.
 
 ## C. Cập nhật bản không cần in (Hưng ủy quyền sửa tích hợp)
 

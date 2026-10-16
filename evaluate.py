@@ -134,8 +134,10 @@ def main():
     grid = df[df["case"] == "grid"]
     found = grid[grid["found"] == 1]
     gt_err = {"x": args.gt_err_cm, "z": args.gt_err_cm, "yaw": args.gt_err_deg}
-    synthetic = "synthetic" in os.path.basename(args.csv)
-    tag = "_synthetic" if synthetic else ""
+    name = os.path.basename(args.csv)
+    synthetic = "synthetic" in name
+    render = "render" in name
+    tag = "_synthetic" if synthetic else ("_render" if render else "")
 
     lat = df["latency_total_ms"].dropna()
     lat_txt = f"p50 = {np.percentile(lat, 50):.1f} ms, p95 = {np.percentile(lat, 95):.1f} ms (n={len(lat)})" \
@@ -146,6 +148,10 @@ def main():
     parts = [f"# Ket qua danh gia ({os.path.basename(args.csv)})", ""]
     if synthetic:
         parts += ["> **DU LIEU GIA** tu synthetic.py, chi de kiem tra pipeline. KHONG dung lam bang chung.", ""]
+    if render:
+        parts += ["> **MO PHONG RENDER**: video marker do camera ao chieu ra, ArUco/PnP/Kalman chay that tren tung frame; "
+                  "GT va K thuoc camera ao (test_p4_e2e.py). KHONG phai phep do bang thuoc, khong suy ra do chinh xac "
+                  "camera that.", ""]
     parts += [
         f"Tong {len(df)} frame, {grid['pose_id'].nunique()} tu the luoi, ti le nhan dien luoi "
         f"{100 * grid['found'].mean():.1f}%. Sai so GT gia dinh: +-{args.gt_err_cm} cm, +-{args.gt_err_deg} deg.",

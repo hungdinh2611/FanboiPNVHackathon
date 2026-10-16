@@ -71,8 +71,8 @@ table{border-collapse:collapse} th,td{border-bottom:1px solid #c9ced6;padding:.3
 </div>
 </div>
 <p style="font-size:28px;color:#8FA0B6">Hỏng giữa chừng: chuyển sang video dự phòng, màn hình hiện “VIDEO DA GHI - KHONG PHAI LIVE”.</p>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#8FA0B6">3 · Lệnh chạy: python run_demo.py</p>
-<div class="notes">Ghi chú: P3 cầm máy, P1 cầm thẻ. Bước 4 là ca lỗi ăn điểm Bằng chứng: P1 giải thích vì sao. Nếu webcam hỏng, nói rõ đang chiếu video.</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#8FA0B6">3 · Không in thẻ: python run_demo.py --no-print · Có webcam: python run_demo.py</p>
+<div class="notes">Ghi chú: Mở đầu bằng câu: vì chưa kịp in marker, nhóm dùng camera ảo với marker render; ArUco, PnP và Kalman vẫn chạy trực tiếp trên từng frame, số ground truth đến từ mô hình, chưa phải phép đo vật lý. Có thể mở marker_7.png trên điện thoại đưa trước webcam để giám khảo thử. P3 cầm máy, P1 cầm thẻ. Bước 4 là ca lỗi ăn điểm Bằng chứng: P1 giải thích vì sao. Nếu webcam hỏng, nói rõ đang chiếu video.</div>
 </section>
 </div></div><div class="n"></div><div class="frame"><div class="scaler"><section id="architecture" data-transition="fade" style="background:#F5F6F2;color:#13233A;font-family:'Be Vietnam Pro', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
 <h2 style="font-size:64px;font-weight:700;line-height:1.1">Kiến trúc và trụ cột Track 4</h2>
@@ -92,49 +92,53 @@ table{border-collapse:collapse} th,td{border-bottom:1px solid #c9ced6;padding:.3
 <tr><td>Hình học</td><td>Hiệu chuẩn camera, solvePnP (IPPE), đổi sang hệ tọa độ đầu sạc</td></tr>
 <tr><td>Bất định</td><td>Kalman, nhiễu đo tăng theo z², gating Mahalanobis, elip ±2 sigma</td></tr>
 <tr><td>Thời gian</td><td>Chỉ giữ frame mới nhất, timestamp từng tầng, latency p50/p95</td></tr>
-<tr><td>Bằng chứng</td><td>Ground truth bằng thước trên lưới 12 tư thế, ca lỗi có chủ đích</td></tr>
+<tr><td>Bằng chứng</td><td>Ground truth camera ảo trên lưới 12 tư thế, ca lỗi có chủ đích, quy trình đo thước sẵn sàng</td></tr>
 </table>
 <p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#4A5568">4</p>
 <div class="notes">Ghi chú: P2, 30 giây. Mỗi trụ cột chỉ vào đúng một khâu trong luồng. Nhấn mạnh: hiển thị độ bất định chứ không chỉ một con số.</div>
 </section>
-</div></div><div class="n"></div><div class="frame"><div class="scaler"><section id="results" data-transition="fade" style="background:#F5F6F2;color:#13233A;font-family:'Be Vietnam Pro', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
-<h2 style="font-size:64px;font-weight:700;line-height:1.1">Số đo so với thước (12 tư thế, 30 frame mỗi tư thế)</h2>
+</div></div><div class="n"></div><div class="frame"><div class="scaler"><section id="results" data-transition="fade" style="background:#F5F6F2;color:#13233A;font-family:'Be Vietnam Pro', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:700;color:#B5541B;letter-spacing:2px">MÔ PHỎNG · CAMERA ẢO · CHƯA ĐO BẰNG THƯỚC</p>
+<h2 style="font-size:64px;font-weight:700;line-height:1.1">Số đo trên 12 tư thế, 30 frame mỗi tư thế</h2>
+</div>
 <div style="display:flex;gap:48px;align-items:start">
 <table style="font-size:28px;color:#13233A;width:1000px">
-<tr><th style="width:28%">Khoảng cách</th><th style="width:24%">MAE z raw</th><th style="width:24%">MAE z Kalman</th><th style="width:24%">p95 z</th></tr>
-<tr><td>30 cm</td><td>[__] cm</td><td>[__] cm</td><td>[__] cm</td></tr>
-<tr><td>60 cm</td><td>[__] cm</td><td>[__] cm</td><td>[__] cm</td></tr>
-<tr><td>100 cm</td><td>[__] cm</td><td>[__] cm</td><td>[__] cm</td></tr>
+<tr><th style="width:28%">Khoảng cách</th><th style="width:24%">MAE z raw</th><th style="width:24%">MAE z Kalman</th><th style="width:24%">p95 z raw</th></tr>
+<tr><td>30 cm</td><td>0.04 cm</td><td>0.04 cm</td><td>0.06 cm</td></tr>
+<tr><td>60 cm</td><td>0.15 cm</td><td>0.15 cm</td><td>0.46 cm</td></tr>
+<tr><td>100 cm</td><td>0.41 cm</td><td>0.41 cm</td><td>0.65 cm</td></tr>
 </table>
 <div style="flex:1;display:flex;flex-direction:column;gap:24px">
 <div style="display:flex;flex-direction:column;gap:4px;background:#FFFFFD;border:1px solid #D8DDE3;border-radius:16px;padding:28px">
-<p style="font-size:56px;font-weight:800;color:#2F6FDB">[__]%</p>
-<p style="font-size:24px;color:#4A5568">Kalman giảm rung khi đứng yên</p>
+<p style="font-size:56px;font-weight:800;color:#2F6FDB">~85%</p>
+<p style="font-size:24px;color:#4A5568">Kalman giảm rung khi đứng yên (mô phỏng)</p>
 </div>
 <div style="display:flex;flex-direction:column;gap:4px;background:#FFFFFD;border:1px solid #D8DDE3;border-radius:16px;padding:28px">
-<p style="font-size:56px;font-weight:800;color:#2F6FDB">[__]%</p>
-<p style="font-size:24px;color:#4A5568">lỗi thực nằm trong ±2 sigma (kỳ vọng 95%)</p>
+<p style="font-size:56px;font-weight:800;color:#2F6FDB">11/12</p>
+<p style="font-size:24px;color:#4A5568">tư thế đạt GOOD ≥ 90% (mô phỏng)</p>
 </div>
 <div style="display:flex;flex-direction:column;gap:4px;background:#FFFFFD;border:1px solid #D8DDE3;border-radius:16px;padding:28px">
-<p style="font-size:56px;font-weight:800;color:#2F6FDB">[__] ms</p>
-<p style="font-size:24px;color:#4A5568">độ trễ p50 từ lúc chụp tới HUD</p>
+<p style="font-size:56px;font-weight:800;color:#2F6FDB">12.2 ms</p>
+<p style="font-size:24px;color:#4A5568">độ trễ p50 trên webcam thật (p95 15.5 ms)</p>
 </div>
 </div>
 </div>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#4A5568">5 · Nguồn: report/metrics.md · Sai số của chính thước khoảng ±2 mm, ±2 độ</p>
-<div class="notes">Ghi chú: P4. Điền số từ report/metrics.md sau khi chạy evaluate.py trên data/gt_runs.csv. KHÔNG dùng số từ metrics_synthetic.md hay từ video render. Nói rõ: lỗi nhỏ hơn sai số thước thì không khẳng định được.</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#4A5568">5 · Nguồn: report/metrics_render.md · Lỗi tăng theo z đúng như lý thuyết; đây là giới hạn thuật toán khi ảnh gần lý tưởng</p>
+<div class="notes">Ghi chú: P4. Mở đầu bằng: số này là mô phỏng camera ảo, chưa đo bằng thước. Nó chứng minh pipeline đúng hình học và lỗi tăng theo khoảng cách như lý thuyết; webcam thật chắc chắn kém hơn. Độ trễ là số duy nhất đo trên phần cứng thật: 300 frame, chỉ phần mềm, từ lúc grab tới vẽ xong HUD.</div>
 </section>
-</div></div><div class="n"></div><div class="frame"><div class="scaler"><section id="failures" data-transition="fade" style="background:#F5F6F2;color:#13233A;font-family:'Be Vietnam Pro', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
-<h2 style="font-size:64px;font-weight:700;line-height:1.1">Ca lỗi và vì sao</h2>
+</div></div><div class="n"></div><div class="frame"><div class="scaler"><section id="failures" data-transition="fade" style="background:#F5F6F2;color:#13233A;font-family:'Be Vietnam Pro', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<h2 style="font-size:64px;font-weight:700;line-height:1.1">Ca lỗi và vì sao (mô phỏng)</h2>
 <table style="font-size:26px;color:#13233A">
 <tr><th style="width:20%">Ca</th><th style="width:30%">Hiện tượng</th><th style="width:28%">Nguyên nhân</th><th style="width:22%">Hệ thống phản ứng</th></tr>
-<tr><td>Xa và nghiêng vừa</td><td>Yaw nhảy giữa +19 và −19 độ dù thẻ đứng yên</td><td>Marker nhỏ, hai nghiệm PnP gần như bằng nhau</td><td>ambiguous, DEGRADED</td></tr>
-<tr><td>Che một góc</td><td>Mất marker hoàn toàn</td><td>Detector cần đủ 4 cạnh khung đen</td><td>LOST sau 0.5 s, không chỉ dẫn</td></tr>
-<tr><td>Lóa phản chiếu</td><td>[__]</td><td>[__]</td><td>[__]</td></tr>
+<tr><td>Xa và nghiêng vừa</td><td>Yaw nhảy giữa +19 và −19 độ dù thẻ đứng yên</td><td>Marker nhỏ, hai nghiệm PnP gần như bằng nhau</td><td>ambiguous 60%, GOOD chỉ 23%</td></tr>
+<tr><td>Lóa</td><td>60/60 frame không nhận marker</td><td>Mất tương phản đen trắng của các ô mã</td><td>LOST, không chỉ dẫn</td></tr>
+<tr><td>Che một góc</td><td>60/60 frame không nhận marker</td><td>Detector cần đủ 4 cạnh khung đen</td><td>LOST, không chỉ dẫn</td></tr>
+<tr><td>Thẻ sai ID</td><td>Thấy thẻ nhưng bỏ qua</td><td>Chỉ nhận đúng id 7</td><td>Không bị đánh lừa</td></tr>
 </table>
-<p style="font-size:28px;line-height:1.4;color:#4A5568">Hai dòng đầu đã thấy trên video render khi kiểm thử; cần xác nhận lại bằng thẻ in thật trước khi trình bày.</p>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#4A5568">6 · Nguồn: report/failure_cases.md</p>
-<div class="notes">Ghi chú: P4 (P1 bổ sung nếu bị hỏi về PnP). Chỉ nói phản ứng đã quan sát thật. Nếu ca thật khác ca render, sửa bảng theo ca thật. Khi demo bước 4, chỉ vào đúng dòng này.</div>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Giới hạn còn lại: ở ca đầu vẫn có frame lật nghiệm mà báo GOOD. Ngoài đời, lóa có thể chỉ làm tăng lỗi chứ không mất hẳn marker.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#4A5568">6 · Nguồn: report/failure_cases.md, report/validation_render.md (12/12 kiểm tra PASS)</p>
+<div class="notes">Ghi chú: P4, P1 bổ sung nếu bị hỏi về PnP. Ca đầu là ca ăn điểm nhất: chỉ ra hệ thống biết mình không chắc ở phần lớn frame, và nói thẳng phần còn sót. Khi demo đến đoạn che/lóa/mờ, chỉ vào bảng này.</div>
 </section>
 </div></div><div class="n"></div><div class="frame"><div class="scaler"><section id="limits" data-transition="fade" style="background:#F5F6F2;color:#13233A;font-family:'Be Vietnam Pro', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
 <h2 style="font-size:64px;font-weight:700;line-height:1.1">Giới hạn đã chứng minh</h2>
@@ -145,11 +149,11 @@ table{border-collapse:collapse} th,td{border-bottom:1px solid #c9ced6;padding:.3
 </div>
 <div style="display:flex;flex-direction:column;gap:12px;background:#FFFFFD;border:1px solid #D8DDE3;border-radius:16px;padding:40px">
 <h3 style="font-size:40px;font-weight:700">Vùng đã đo</h3>
-<p style="font-size:30px;line-height:1.4;color:#4A5568">z 30–100 cm, yaw 0–40 độ, một camera, một phòng, một điều kiện ánh sáng.</p>
+<p style="font-size:30px;line-height:1.4;color:#4A5568">z 30–100 cm, yaw 0–40 độ, nhiễu và ánh sáng do mô hình tạo ra, chưa phải phòng thật.</p>
 </div>
 <div style="display:flex;flex-direction:column;gap:12px;background:#FFFFFD;border:1px solid #D8DDE3;border-radius:16px;padding:40px">
-<h3 style="font-size:40px;font-weight:700">Sai số ground truth</h3>
-<p style="font-size:30px;line-height:1.4;color:#4A5568">Thước khoảng ±2 mm, thước góc khoảng ±2 độ, cộng vị trí tâm ống kính ước lượng.</p>
+<h3 style="font-size:40px;font-weight:700">Chưa đo vật lý</h3>
+<p style="font-size:30px;line-height:1.4;color:#4A5568">Số đo là camera ảo. Webcam chạy với K ước lượng (HFOV 68 độ), nên cm chưa kiểm chứng.</p>
 </div>
 <div style="display:flex;flex-direction:column;gap:12px;background:#FFFFFD;border:1px solid #D8DDE3;border-radius:16px;padding:40px">
 <h3 style="font-size:40px;font-weight:700">Sigma không thấy bias</h3>
